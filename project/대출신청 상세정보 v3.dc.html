@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/pepper-digital-admin-design-system-0682d9fb-07ee-4382-84d3-acb045b69cd8/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/pepper-digital-admin-design-system-0682d9fb-07ee-4382-84d3-acb045b69cd8/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/pepper-digital-admin-design-system-0682d9fb-07ee-4382-84d3-acb045b69cd8/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/pepper-digital-admin-design-system-0682d9fb-07ee-4382-84d3-acb045b69cd8/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/pepper-digital-admin-design-system-0682d9fb-07ee-4382-84d3-acb045b69cd8/tokens/effects.css">
+  <link rel="stylesheet" href="_ds/pepper-digital-admin-design-system-0682d9fb-07ee-4382-84d3-acb045b69cd8/tokens/base.css">
+  <link rel="stylesheet" href="_ds/pepper-digital-admin-design-system-0682d9fb-07ee-4382-84d3-acb045b69cd8/tokens/images.css">
+  <link rel="stylesheet" href="_ds/pepper-digital-admin-design-system-0682d9fb-07ee-4382-84d3-acb045b69cd8/styles.css">
+  <script src="_ds/pepper-digital-admin-design-system-0682d9fb-07ee-4382-84d3-acb045b69cd8/_ds_bundle.js"></script>
+  <style>body{margin:0;font-family:var(--font-sans);} a{color:var(--pp-navy-800);} a:hover{color:#5c6284;}</style>
+</helmet>
+<div data-screen-label="대출신청 상세정보 v3" style="min-width:1860px;height:100vh;display:flex;flex-direction:column;background:#fff;font-family:var(--font-sans);color:#303030;">
+  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.AppHeader" menu="{{ menu }}" active="여신" user-name="절삼규" user-position="(280820)" last-login="" shortcuts="{{ shortcuts }}" history="{{ history }}" hint-size="100%,50px"></x-import>
+  <div style="flex:1;display:flex;min-height:0;">
+    <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Lnb" tree="{{ tree }}" tabs="{{ lnbTabs }}" active-id="detail" open="{{ lnbOpen }}" on-toggle-open="{{ setLnb }}" hint-size="282px,100%"></x-import>
+    <main style="flex:1;min-width:0;overflow:auto;padding:{{ mainPad }};">
+      <div style="display:flex;align-items:center;gap:8px;border-bottom:1px solid #dee2e6;margin-bottom:20px;padding:0 0 10px 10px;">
+        <h4 style="font-size:24px;font-weight:700;line-height:1.2;margin:0;">대출신청 상세정보</h4>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:15px;">
+        <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.InputGroup" icon="search" width="840" input-props="{{ searchProps }}" hint-size="840px,24px"></x-import>
+        <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Button" variant="primary" hint-size="60px,24px">조회</x-import>
+        <div style="margin-left:auto;display:flex;gap:4px;">
+          <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Button" variant="outline" on-click="{{ openHist }}" hint-size="90px,24px">정보변경이력</x-import>
+          <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Button" variant="danger" hint-size="90px,24px">진행단계변경</x-import>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-bottom:20px;">
+        <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="회원정보" actions="{{ act.member }}" hint-size="100%,170px">
+          <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.member }}" hint-size="100%,120px"></x-import>
+        </x-import>
+        <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="신청현황" actions="{{ act.terms }}" hint-size="100%,170px">
+          <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.apply }}" hint-size="100%,120px"></x-import>
+        </x-import>
+      </div>
+
+      <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Tabs" items="{{ tabs }}" value="{{ tab }}" on-change="{{ setTab }}" hint-size="100%,36px"></x-import>
+
+      <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start;padding-top:20px;">
+          <div style="display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 120px);overflow-y:auto;overscroll-behavior:contain;padding-right:6px;">
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="신청정보" actions="{{ act.loan }}" hint-size="100%,220px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.loan }}" hint-size="100%,170px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="고객정보" actions="{{ act.customer }}" hint-size="100%,250px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.customer }}" hint-size="100%,200px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="사업장 정보" actions="{{ act.biz }}" hint-size="100%,250px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.biz }}" hint-size="100%,200px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="소득정보" actions="{{ act.income }}" hint-size="100%,80px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.income }}" hint-size="100%,30px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="인지세 면제 대상 여부 / 국민주택채권 매입 면제대상 여부" actions="{{ act.tax }}" hint-size="100%,80px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 2 }}" rows="{{ r.tax }}" label-width="22%" value-width="28%" hint-size="100%,30px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="전자약정" actions="{{ act.contract }}" hint-size="100%,80px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.contract }}" hint-size="100%,30px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="본인확인" actions="{{ act.identity }}" hint-size="100%,200px">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="padding:0 5px;">
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Select" options="{{ idOpts1 }}" width="140" hint-size="140px,24px"></x-import>
+                </div>
+                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.id1 }}" hint-size="100%,30px"></x-import>
+                <div style="border-top:1px solid #dee2e6;margin:8px 0 4px;"></div>
+                <div style="padding:0 5px;">
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Select" options="{{ idOpts2 }}" width="140" hint-size="140px,24px"></x-import>
+                </div>
+                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.id2 }}" hint-size="100%,30px"></x-import>
+                <div style="border-top:1px solid #dee2e6;margin:8px 0 4px;"></div>
+                <div style="padding:0 5px;">
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Select" options="{{ idOpts3 }}" width="140" hint-size="140px,24px"></x-import>
+                </div>
+                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.id3 }}" hint-size="100%,30px"></x-import>
+              </div>
+            </x-import>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 120px);overflow-y:auto;overscroll-behavior:contain;padding-right:6px;">
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="한도산출정보" actions="{{ act.limit }}" hint-size="100%,210px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.limit }}" hint-size="100%,160px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="금리정보" actions="{{ act.rate }}" hint-size="100%,110px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.rate }}" hint-size="100%,60px"></x-import>
+            </x-import>
+
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="확인정보" hint-size="100%,560px">
+              <div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div style="display:flex;align-items:baseline;gap:8px;padding:0 5px;"><span style="font-size:13px;font-weight:700;color:#303030;">{{ secLoans }}</span><span style="font-size:12px;color:#707070;">기준일자 2026-09-05 15:40:15</span></div>
+                  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <thead>
+                      <tr style="background:#f6f6f6;border-top:1px solid #dee2e6;border-bottom:1px solid #dee2e6;">
+                        <th style="text-align:left;padding:7px 10px;font-weight:700;">상품명(코드)</th>
+                        <th style="text-align:center;padding:7px 10px;font-weight:700;">계좌상태</th>
+                        <th style="text-align:right;padding:7px 10px;font-weight:700;">잔액(원)</th>
+                        <th style="text-align:center;padding:7px 10px;font-weight:700;">BS</th>
+                        <th style="text-align:center;padding:7px 10px;font-weight:700;">신규일자</th>
+                        <th style="text-align:right;padding:7px 10px;font-weight:700;">적용금리</th>
+                        <th style="text-align:center;padding:7px 10px;font-weight:700;">자금구분</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <sc-for list="{{ loans }}" as="l" hint-placeholder-count="2">
+                        <tr style="border-bottom:1px solid #dee2e6;">
+                          <td style="padding:7px 10px;">{{ l.name }}</td>
+                          <td style="padding:7px 10px;text-align:center;font-weight:700;color:{{ l.color }};">{{ l.status }}</td>
+                          <td style="padding:7px 10px;text-align:right;">{{ l.bal }}</td>
+                          <td style="padding:7px 10px;text-align:center;">{{ l.bs }}</td>
+                          <td style="padding:7px 10px;text-align:center;">{{ l.date }}</td>
+                          <td style="padding:7px 10px;text-align:right;">{{ l.rate }}</td>
+                          <td style="padding:7px 10px;text-align:center;">{{ l.fund }}</td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                  <div style="display:flex;justify-content:flex-end;gap:30px;font-size:12px;padding:0 10px;">
+                    <div style="display:flex;gap:10px;"><span style="font-weight:700;color:#505050;">당행 기대출잔액</span><span style="font-weight:700;">28,000,000 원</span></div>
+                    <div style="display:flex;gap:10px;"><span style="font-weight:700;color:#505050;">당행 기대출잔액(가계)</span><span style="font-weight:700;">28,000,000 원</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="border-top:1px solid #dee2e6;margin-top:15px;">
+                <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px;">
+                  <div style="font-size:13px;font-weight:700;color:#303030;padding:0 5px;">{{ secPre }}</div>
+                  <div style="display:flex;flex-direction:column;gap:8px;padding:0 5px;">
+                    <sc-for list="{{ checks }}" as="c" hint-placeholder-count="4">
+                      <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Checkbox" label="{{ c.label }}" checked="{{ c.checked }}" on-change="{{ c.toggle }}" hint-size="100%,20px"></x-import>
+                    </sc-for>
+                  </div>
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 2 }}" rows="{{ r.precheck }}" hint-size="100%,30px"></x-import>
+                </div>
+              </div>
+
+              <div style="border-top:1px solid #dee2e6;margin-top:15px;">
+                <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px;">
+                  <div style="font-size:13px;font-weight:700;color:#303030;padding:0 5px;">{{ secCaution }}</div>
+                  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <thead>
+                      <tr style="background:#f6f6f6;border-top:1px solid #dee2e6;border-bottom:1px solid #dee2e6;">
+                        <th style="text-align:center;padding:7px 10px;font-weight:700;width:18%;">등록일</th>
+                        <th style="text-align:left;padding:7px 10px;font-weight:700;">사유</th>
+                        <th style="text-align:center;padding:7px 10px;font-weight:700;width:18%;">해제일</th>
+                        <th style="text-align:center;padding:7px 10px;font-weight:700;width:14%;">해제여부</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <sc-for list="{{ cautions }}" as="c" hint-placeholder-count="2">
+                        <tr style="border-bottom:1px solid #dee2e6;">
+                          <td style="padding:7px 10px;text-align:center;">{{ c.reg }}</td>
+                          <td style="padding:7px 10px;">{{ c.reason }}</td>
+                          <td style="padding:7px 10px;text-align:center;">{{ c.release }}</td>
+                          <td style="padding:7px 10px;text-align:center;font-weight:700;color:{{ c.color }};">{{ c.yn }}</td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </x-import>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isProvider }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:10px;padding-top:20px;">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start;">
+            <div style="display:flex;flex-direction:column;gap:10px;height:max(420px, calc(100vh - 440px));overflow-y:auto;overscroll-behavior:contain;padding-right:6px;">
+              <div style="display:flex;align-items:center;gap:8px;padding:0 2px;">
+                <span style="font-size:14px;font-weight:700;color:#303030;">담보제공자</span>
+                <span style="font-size:12px;color:#707070;">{{ providerCount }}</span>
+                <div style="margin-left:auto;display:flex;gap:4px;">
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Button" variant="outline" size="sm" on-click="{{ expandAllP }}" hint-size="60px,22px">전체열기</x-import>
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Button" variant="outline" size="sm" on-click="{{ collapseAllP }}" hint-size="60px,22px">전체닫기</x-import>
+                </div>
+              </div>
+              <sc-for list="{{ providers }}" as="p" hint-placeholder-count="2">
+                <div style="border:1px solid #dee2e6;border-radius:4px;overflow:hidden;flex-shrink:0;">
+                  <div onClick="{{ p.toggle }}" style="display:flex;align-items:center;gap:10px;padding:10px 15px;background:#f6f6f6;cursor:pointer;" style-hover="background:#ececec;">
+                    <span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--pp-navy-800);color:#fff;font-size:11px;font-weight:700;">{{ p.no }}</span>
+                    <span style="font-size:15px;font-weight:700;color:#303030;">담보제공자정보 {{ p.no }}</span>
+                    <span style="font-size:12px;color:#707070;">{{ p.summary }}</span>
+                    <span style="margin-left:auto;font-size:12px;font-weight:700;color:#505050;">{{ p.toggleLabel }}</span>
+                    <span style="display:inline-block;font-size:10px;color:#505050;transform:{{ p.caret }};transition:transform .15s;">▼</span>
+                  </div>
+                  <sc-if value="{{ p.open }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;flex-direction:column;gap:10px;padding:10px;">
+                      <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="담보제공자정보" hint-size="100%,170px">
+                        <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ p.member }}" hint-size="100%,120px"></x-import>
+                      </x-import>
+                      <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="고객정보" actions="{{ p.customerAct }}" hint-size="100%,250px">
+                        <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ p.customer }}" hint-size="100%,200px"></x-import>
+                      </x-import>
+                      <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="담보제공자처리현황" actions="{{ act.pTerms }}" hint-size="100%,80px">
+                        <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ p.status }}" hint-size="100%,30px"></x-import>
+                      </x-import>
+                      <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="전자약정" actions="{{ act.contract }}" hint-size="100%,80px">
+                        <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ p.contract }}" hint-size="100%,30px"></x-import>
+                      </x-import>
+                      <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="본인확인" actions="{{ act.identity }}" hint-size="100%,260px">
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                          <sc-for list="{{ p.idBlocks }}" as="b" hint-placeholder-count="3">
+                            <div style="display:flex;flex-direction:column;gap:6px;border-top:{{ b.border }};padding-top:{{ b.pad }};">
+                              <div style="padding:0 5px;">
+                                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Select" options="{{ b.opts }}" width="140" hint-size="140px,24px"></x-import>
+                              </div>
+                              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ b.rows }}" hint-size="100%,30px"></x-import>
+                            </div>
+                          </sc-for>
+                        </div>
+                      </x-import>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;height:max(420px, calc(100vh - 440px));overflow-y:auto;overscroll-behavior:contain;padding-right:6px;">
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="담보정보" actions="{{ act.col }}" hint-size="100%,300px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.col }}" hint-size="100%,260px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="소유자정보" hint-size="100%,100px">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                  <tr style="background:#f6f6f6;border-top:1px solid #dee2e6;border-bottom:1px solid #dee2e6;">
+                    <th style="text-align:center;padding:7px 10px;font-weight:700;width:50px;">No.</th>
+                    <th style="text-align:left;padding:7px 10px;font-weight:700;">소유자</th>
+                    <th style="text-align:left;padding:7px 10px;font-weight:700;">소유형태</th>
+                    <th style="text-align:right;padding:7px 10px;font-weight:700;">소유지분율(%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ owners }}" as="o" hint-placeholder-count="1">
+                    <tr style="border-bottom:1px solid #dee2e6;">
+                      <td style="padding:7px 10px;text-align:center;">{{ o.no }}</td>
+                      <td style="padding:7px 10px;">{{ o.name }}</td>
+                      <td style="padding:7px 10px;">{{ o.type }}</td>
+                      <td style="padding:7px 10px;text-align:right;">{{ o.share }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="담보설정정보" actions="{{ act.lien }}" hint-size="100%,100px">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                  <tr style="background:#f6f6f6;border-top:1px solid #dee2e6;border-bottom:1px solid #dee2e6;">
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;width:40px;">No.</th>
+                    <th style="text-align:left;padding:7px 8px;font-weight:700;">설정기관</th>
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;">설정일자</th>
+                    <th style="text-align:right;padding:7px 8px;font-weight:700;">설정금액(원)</th>
+                    <th style="text-align:right;padding:7px 8px;font-weight:700;">대출잔액(원)</th>
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;">말소</th>
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;">채무자</th>
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;">대환</th>
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;">추가/삭제</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ liens }}" as="l" hint-placeholder-count="1">
+                    <tr style="border-bottom:1px solid #dee2e6;">
+                      <td style="padding:7px 8px;text-align:center;">{{ l.no }}</td>
+                      <td style="padding:7px 8px;">{{ l.org }}</td>
+                      <td style="padding:7px 8px;text-align:center;">{{ l.date }}</td>
+                      <td style="padding:4px 8px;text-align:right;">
+                        <sc-if value="{{ l.viewing }}" hint-placeholder-val="{{ true }}">{{ l.amt }}</sc-if>
+                        <sc-if value="{{ l.editing }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Input" dc-props="{{ l.amtProps }}" hint-size="100%,24px"></x-import></sc-if>
+                      </td>
+                      <td style="padding:4px 8px;text-align:right;">
+                        <sc-if value="{{ l.viewing }}" hint-placeholder-val="{{ true }}">{{ l.bal }}</sc-if>
+                        <sc-if value="{{ l.editing }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Input" dc-props="{{ l.balProps }}" hint-size="100%,24px"></x-import></sc-if>
+                      </td>
+                      <td style="padding:4px 8px;"><div style="display:flex;justify-content:center;"><x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Checkbox" checked="{{ l.cancel }}" disabled="{{ l.disabled }}" on-change="{{ l.toggle }}" hint-size="18px,18px"></x-import></div></td>
+                      <td style="padding:7px 8px;text-align:center;">{{ l.debtor }}</td>
+                      <td style="padding:7px 8px;text-align:center;">{{ l.refi }}</td>
+                      <td style="padding:7px 8px;text-align:center;">{{ l.addDel }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="임차인정보" actions="{{ act.tenant }}" hint-size="100%,200px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.tenant }}" hint-size="100%,150px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="담보시세정보" actions="{{ act.pPrice }}" hint-size="100%,120px">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                  <tr style="background:#f6f6f6;border-top:1px solid #dee2e6;border-bottom:1px solid #dee2e6;">
+                    <th style="text-align:center;padding:7px 10px;font-weight:700;width:50px;">No.</th>
+                    <th style="text-align:left;padding:7px 10px;font-weight:700;">감정기관</th>
+                    <th style="text-align:center;padding:7px 10px;font-weight:700;">시세업데이트일자</th>
+                    <th style="text-align:right;padding:7px 10px;font-weight:700;">하위평균가(원)</th>
+                    <th style="text-align:right;padding:7px 10px;font-weight:700;">일반평균가(원)</th>
+                    <th style="text-align:right;padding:7px 10px;font-weight:700;">상위평균가(원)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ prices }}" as="p" hint-placeholder-count="2">
+                    <tr style="border-bottom:1px solid #dee2e6;">
+                      <td style="padding:7px 10px;text-align:center;">{{ p.no }}</td>
+                      <td style="padding:7px 10px;">{{ p.org }}</td>
+                      <td style="padding:7px 10px;text-align:center;">{{ p.date }}</td>
+                      <td style="padding:7px 10px;text-align:right;">{{ p.low }}</td>
+                      <td style="padding:7px 10px;text-align:right;font-weight:700;">{{ p.mid }}</td>
+                      <td style="padding:7px 10px;text-align:right;">{{ p.high }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Modal" open="{{ kbOpen }}" title="KB시세 상세열람" width="900" on-close="{{ closeKb }}" footer="{{ kbFooter }}" hint-size="0px,0px">
+              <div style="font-size:12px;color:#707070;margin-bottom:8px;">{{ kbMeta }}</div>
+              <div style="display:grid;grid-template-columns:repeat(4,auto minmax(0,1fr));gap:0;background:#f6f6f6;border-top:1px solid #dee2e6;border-bottom:1px solid #dee2e6;font-size:12px;">
+                <sc-for list="{{ kbHead }}" as="k" hint-placeholder-count="4">
+                  <span style="padding:7px 10px;font-weight:700;color:#505050;">{{ k.l }}</span>
+                  <span style="padding:7px 10px;font-weight:700;">{{ k.v }}</span>
+                </sc-for>
+              </div>
+              <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;">
+                <colgroup><col style="width:18%;"></col><col style="width:32%;"></col><col style="width:18%;"></col><col style="width:32%;"></col></colgroup>
+                <tbody>
+                  <sc-for list="{{ kbRows }}" as="k" hint-placeholder-count="12">
+                    <tr style="border-bottom:1px solid #dee2e6;">
+                      <td style="padding:6px 10px;font-weight:700;color:#505050;background:#fafafa;">{{ k.l1 }}</td>
+                      <td style="padding:6px 10px;">{{ k.v1 }}</td>
+                      <td style="padding:6px 10px;font-weight:700;color:#505050;background:#fafafa;">{{ k.l2 }}</td>
+                      <td style="padding:6px 10px;">{{ k.v2 }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </x-import>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isCost }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:stretch;padding-top:20px;">
+          <div style="display:flex;flex-direction:column;gap:10px;height:max(420px, calc(100vh - 440px));overflow-y:auto;overscroll-behavior:contain;padding-right:6px;">
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="권원보험 설정 정보" actions="{{ act.tiSet }}" hint-size="100%,90px">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.tiOpt }}" hint-size="100%,30px"></x-import>
+                <sc-if value="{{ tiDirty }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px;color:var(--pp-red-500, #df0024);padding:0 5px;">* 변경된 항목이 있습니다. [저장]을 눌러 반영하세요.</div>
+                </sc-if>
+              </div>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="권원보험 설정상세" hint-size="100%,380px">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.tiSet }}" hint-size="100%,90px"></x-import>
+                <div style="border-top:1px solid #dee2e6;margin:8px 0 4px;"></div>
+                <div style="font-size:13px;font-weight:700;color:#303030;padding:0 5px;">등기부조사결과</div>
+                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.tiReg }}" hint-size="100%,60px"></x-import>
+                <div style="border-top:1px solid #dee2e6;margin:8px 0 4px;"></div>
+                <div style="font-size:13px;font-weight:700;color:#303030;padding:0 5px;">전입세대조사결과</div>
+                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.tiMove }}" hint-size="100%,30px"></x-import>
+                <div style="border-top:1px solid #dee2e6;margin:8px 0 4px;"></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:0 5px;">
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Radio" label="신청취소" name="tiAction" checked="{{ tiCancel }}" on-change="{{ setTiCancel }}" hint-size="80px,20px"></x-import>
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Radio" label="오프라인이관" name="tiAction" checked="{{ tiOffline }}" on-change="{{ setTiOffline }}" hint-size="100px,20px"></x-import>
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Select" options="{{ tiReasons }}" width="240" hint-size="240px,24px"></x-import>
+                  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Button" variant="danger" size="sm" hint-size="50px,24px">확인</x-import>
+                </div>
+              </div>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="권원보험 전문이력" hint-size="100%,360px">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                  <tr style="background:#f6f6f6;border-top:1px solid #dee2e6;border-bottom:1px solid #dee2e6;">
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;width:36px;">No.</th>
+                    <th style="text-align:left;padding:7px 8px;font-weight:700;">전문코드</th>
+                    <th style="text-align:left;padding:7px 8px;font-weight:700;">전문종류</th>
+                    <th style="text-align:left;padding:7px 8px;font-weight:700;">권원보험단계</th>
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;">전문처리일시</th>
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;">전문성공여부</th>
+                    <th style="text-align:center;padding:7px 8px;font-weight:700;width:84px;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ tiMsgs }}" as="m" hint-placeholder-count="9">
+                    <tr style="border-bottom:1px solid #dee2e6;">
+                      <td style="padding:6px 8px;text-align:center;">{{ m.no }}</td>
+                      <td style="padding:6px 8px;"><a href="#" style="color:var(--pp-navy-800);text-decoration:underline;">{{ m.code }}</a></td>
+                      <td style="padding:6px 8px;">{{ m.kind }}</td>
+                      <td style="padding:6px 8px;">{{ m.step }}</td>
+                      <td style="padding:6px 8px;text-align:center;">{{ m.at }}</td>
+                      <td style="padding:6px 8px;text-align:center;">{{ m.ok }}</td>
+                      <td style="padding:3px 8px;text-align:center;">
+                        <sc-if value="{{ m.resend }}" hint-placeholder-val="{{ false }}">
+                          <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Button" variant="outline" size="sm" hint-size="70px,22px">전문재전송</x-import>
+                        </sc-if>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </x-import>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;height:max(420px, calc(100vh - 440px));overflow-y:auto;overscroll-behavior:contain;padding-left:4px;padding-right:6px;">
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="계좌정보" hint-size="100%,110px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.cAcct }}" hint-size="100%,60px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="송금정보" actions="{{ act.cSend }}" hint-size="100%,80px">
+              <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.cSend }}" hint-size="100%,30px"></x-import>
+            </x-import>
+            <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="비용상세" actions="{{ act.cost }}" hint-size="100%,300px">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:baseline;gap:8px;padding:0 5px;"><span style="font-size:13px;font-weight:700;color:#303030;">은행부담비용</span><span style="font-size:12px;color:#707070;">{{ bankTotal }}</span></div>
+                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.cBank }}" hint-size="100%,90px"></x-import>
+                <div style="border-top:1px solid #dee2e6;margin:8px 0 4px;"></div>
+                <div style="display:flex;align-items:baseline;gap:8px;padding:0 5px;"><span style="font-size:13px;font-weight:700;color:#303030;">고객부담비용</span><span style="font-size:12px;color:#707070;">{{ custTotal }}</span></div>
+                <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.FieldTable" columns="{{ 3 }}" rows="{{ r.cCust }}" hint-size="100%,60px"></x-import>
+              </div>
+            </x-import>
+          <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="송금내역" meta="{{ remitMeta }}" hint-size="100%,180px">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead>
+                <tr style="background:#f6f6f6;border-top:1px solid #dee2e6;border-bottom:1px solid #dee2e6;">
+                  <th style="text-align:center;padding:7px 8px;font-weight:700;width:36px;">No.</th>
+                  <th style="text-align:left;padding:7px 8px;font-weight:700;">송금구분</th>
+                  <th style="text-align:left;padding:7px 8px;font-weight:700;">은행명</th>
+                  <th style="text-align:left;padding:7px 8px;font-weight:700;">계좌번호</th>
+                  <th style="text-align:left;padding:7px 8px;font-weight:700;">예금주</th>
+                  <th style="text-align:center;padding:7px 8px;font-weight:700;">송금일시</th>
+                  <th style="text-align:right;padding:7px 8px;font-weight:700;">송금액(원)</th>
+                  <th style="text-align:center;padding:7px 8px;font-weight:700;">완료여부</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ remits }}" as="x" hint-placeholder-count="3">
+                  <tr style="border-bottom:1px solid #dee2e6;">
+                    <td style="padding:7px 8px;text-align:center;">{{ x.no }}</td>
+                    <td style="padding:7px 8px;">{{ x.type }}</td>
+                    <td style="padding:7px 8px;">{{ x.bank }}</td>
+                    <td style="padding:7px 8px;">{{ x.acct }}</td>
+                    <td style="padding:7px 8px;">{{ x.holder }}</td>
+                    <td style="padding:7px 8px;text-align:center;">{{ x.at }}</td>
+                    <td style="padding:7px 8px;text-align:right;font-weight:700;">{{ x.amt }}</td>
+                    <td style="padding:7px 8px;text-align:center;">{{ x.done }}</td>
+                  </tr>
+                </sc-for>
+                <tr style="background:#f6f6f6;">
+                  <td style="padding:7px 8px;font-weight:700;" colspan="6">합계</td>
+                  <td style="padding:7px 8px;text-align:right;font-weight:700;">{{ remitTotal }}</td>
+                  <td style="padding:7px 8px;"></td>
+                </tr>
+              </tbody>
+            </table>
+          </x-import>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ notDetail }}" hint-placeholder-val="{{ false }}">
+        <div style="padding-top:20px;">
+          <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Panel" title="{{ tab }}" hint-size="100%,160px">
+            <div style="height:120px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#707070;">조회된 데이터가 없습니다.</div>
+          </x-import>
+        </div>
+      </sc-if>
+    </main>
+  </div>
+  <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Modal" open="{{ histOpen }}" title="정보변경이력" width="1000" on-close="{{ closeHist }}" footer="{{ histFooter }}" hint-size="0px,0px">
+    <div style="display:flex;flex-direction:column;gap:10px;font-family:var(--font-sans);">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <x-import component-from-global-scope="PepperDigitalAdminDesignSystem_0682d9.Select" options="{{ histOpts }}" value="{{ histFilter }}" on-change="{{ setHistFilter }}" width="180" hint-size="180px,24px"></x-import>
+        <span style="font-size:12px;color:#707070;margin-left:auto;">{{ histCount }}</span>
+      </div>
+      <div style="max-height:420px;overflow:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;color:#303030;">
+          <thead>
+            <tr style="background:#f6f6f6;border-top:1px solid #dee2e6;border-bottom:1px solid #dee2e6;">
+              <th style="text-align:center;padding:7px 10px;font-weight:700;width:150px;">변경일시</th>
+              <th style="text-align:left;padding:7px 10px;font-weight:700;width:130px;">구분</th>
+              <th style="text-align:left;padding:7px 10px;font-weight:700;width:120px;">항목</th>
+              <th style="text-align:left;padding:7px 10px;font-weight:700;">변경전</th>
+              <th style="text-align:left;padding:7px 10px;font-weight:700;">변경후</th>
+              <th style="text-align:center;padding:7px 10px;font-weight:700;width:120px;">변경자</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ histRows }}" as="x" hint-placeholder-count="4">
+              <tr style="border-bottom:1px solid #dee2e6;">
+                <td style="padding:7px 10px;text-align:center;">{{ x.at }}</td>
+                <td style="padding:7px 10px;font-weight:700;color:#505050;">{{ x.section }}</td>
+                <td style="padding:7px 10px;">{{ x.item }}</td>
+                <td style="padding:7px 10px;color:#707070;">{{ x.before }}</td>
+                <td style="padding:7px 10px;font-weight:700;">{{ x.after }}</td>
+                <td style="padding:7px 10px;text-align:center;">{{ x.by }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <sc-if value="{{ noHist }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:30px;text-align:center;font-size:12px;color:#707070;">변경이력이 없습니다.</div>
+        </sc-if>
+      </div>
+    </div>
+  </x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;masked&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;데이터&quot;},&quot;defaultSubTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;loans&quot;,&quot;precheck&quot;,&quot;caution&quot;],&quot;default&quot;:&quot;loans&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;레이아웃&quot;}}">
+const D = {
+  name: '', memberType: '개인', memberStatus: '정상', memberNo: '', phone: '', birth: '',
+  regAt: '2022-08-20 13:11:02', os: 'iOS', lastAt: '2026-10-02 09:41:27', special: 'N', specialAt: '2026-08-30', specialBy: '심사역(280415)',
+  channel: '토스', applyNo: 'MG2026082400073', applyAt: '2026-08-24 10:12:45', applyStatus: '실행완료', stage: '기표송금', savedAt: '2026-09-01 11:03:52',
+  product: '페퍼스 사업자담보대출', loanType: '신규/기고객/갱신', reqAmt: '26,000,000', apprAmt: '26,000,000', maxLimit: '26,000,000',
+  setAmt: '31,200,000 (120%)', repay: '만기일시상환', period: '36 / 0', rateType: '변동금리', rateCycle: '3', earlyFee: '36개월 이내 2.0%',
+  loanDate: '2026-09-01', dueDate: '2029-09-01', payDay: '1일',
+  bizName: '', bizNo: '', closed: 'N', bizAddr: '', bizTel: '',
+  industry: '통신 · 방송장비 및 부품 도매업', expRate: '90.00', continuity: 'N', openDate: '2014-06-12', bizRegDate: '2014-06-12', opPeriod: '11년 4', 
+  taxType: '일반', salesMethod: '부가가치세 과세표준증명원', sales: '106,062,209', joint: 'Y', partners: '', shareDate: '2014-06-12', share: '70',
+  incomeType: '신고소득', incomeMethod: '매출액추정소득', income: '155,119,538',
+  stampTax: '대상', bond: '대상',
+  signAt: '2022-08-24 14:54:05', signBy: '간편바이오(지문)', cmsBy: '사설인증서인증',
+  idAt1: '2022-08-24 11:20:54', idOk1: '성공', idErr1: '0', idAt2: '2022-08-24 11:24:10', idOk2: '성공', idErr2: '0',
+  tiReqAt: '2022-08-11 17:49:34', tiStep: '종료', tiStatus: '진행중', tiLastAt: '2022-08-17 10:25:16', tiErr: '', tiCertDate: '2022-08-17',
+  tiPolicy: 'LH0000000A00000', tiAmt: '55,200,000', tiInfr: 'N', tiCase: 'N', tiEreg: 'Y', tiRegAbn: 'N', tiMoveAbn: 'N',
+  kIfis: '19551234567890', kIfisDate: '2022-08-18', kUid: '19551234567890', kType: '아파트', kArea: '84.85', kAddr: '', kReg: 'Y', kAcq: '2021-04-30', kLandRatio: '34.28',
+  kRooms: '3', kUnits: '1026 / 7', kFloor: '2 / 12', kGrade: '1등급', kZone: '그외지방', kPrior: '25,000,000', kInfr: 'N', kInfrHist: 'N', kCase: 'Y',
+  kOrg: 'KB시세', kValue: '137,500,000', kEvalDate: '2022-08-05',
+  tName: '', tStart: '', tEnd: '', tRank: '', tKind: '', tRight: '', tJeonse: '', tJeonseDate: '', tDeposit: '', tFixed: '', tFixedDate: '', tRent: '', tLease: '', tLeaseDate: '',
+  cCmsBank: 'SC은행', cCmsAcct: '', cCmsName: '', cSendBank: 'SC은행', cSendAcct: '', cSendName: '', cMethod: '계좌이체', cSendType: '대출금 송금',
+  cbStamp: '0', cbTitle: '98,946', cbLegal: '96,880', cbReg: '62,400', cbEdu: '12,480', cbSeal: '10,000', cbTrans: '0', cbSurvey: '12,000', cbEtc: '0',
+  ccStamp: '0', ccFees: '34,231', ccBond: '34,231', ccAddr: '0', ccEtc: '0',
+  pName: '', pType: '개인', pStatus: '정상', pNo: '', pPhone: '', pBirth: '', pRegAt: '2022-08-18 15:10:42', pOs: 'Android', pLastAt: '2022-08-24 11:20:01',
+  pRel: '배우자', pOwnType: '공동소유', pReqAt: '2022-08-18 15:02:11',
+  pHome: '', pHomeTel: '', pRegAddr: '', pJob: '회사원', pJobKind: '사무직', pEmail: '', pMail: '현재거주지주소', pConsent: 'Y / Y / N / Y',
+  pPurpose: '담보제공', pFund: '근로소득', pFee: 'N', pOwner: 'Y',
+  pStage: '전자약정완료', pSavedAt: '2022-08-24 14:55:12', pSignAt: '2022-08-24 14:54:05', pSignBy: '간편바이오(지문)',
+  pIfis: '19551234567890', pIfisDate: '2022-08-18',
+  pIdAt1: '2022-08-24 11:20:54', pIdOk1: '성공', pIdErr1: '0', pIdAt2: '2022-08-24 11:21:23', pIdOk2: '성공', pIdErr2: '0', pIdAt3: '2022-08-24 11:21:23', pIdOk3: '성공', pIdErr3: '0',
+  inOpen: '2014-06-12', inMonths: '136', inSales: '106,062,209', inJoint: 'Y', inSeize: 'N', inReside: 'Y', inSub: 'N',
+  trYn: 'N', trReason: '-', trTarget: 'N', trDate: '-', trNo: '-', trResult: '-', trDetail: '-',
+  titleStatus: '청약완료', regStatus: '등기완료',
+  xExecAt: '2026-09-01 10:30:12', xStatus: '실행완료', xStop: '-', xManual: 'N', xManualBy: '-', xForce: 'N', xForceDesc: '-',
+  xDoneAt: '2026-09-01 10:31:05', xAcct: '', xCustNo: '', xAmt: '26,000,000', xLoanDate: '2026-09-01', xDueDate: '2029-09-01',
+  xMonths: '36', xGrace: '0', xRepay: '만기일시상환', xRateType: '변동금리', xRateCycle: '3', xOverdue: '11.33',
+  xPayDay: '1', xInstall: '180,483', xEarly: '2.00', xCmsBank: '국민은행', xCmsAcct: '', xCmsName: '', xSendBank: '국민은행', xSendAcct: '', xSendName: '', idAt3: '2022-08-24 11:22:31', idOk3: '성공', idErr3: '0',
+  home: '', homeTel: '', regAddr: '',
+  job: '개인사업자(자영업)', jobKind: '판매 관련 관리자', email: '', mailTo: '현재거주지주소', consent: 'Y / Y / Y / N',
+  purpose: '사업상 거래', fund: '대출(차입)', feeNotice: 'N', kfcResult: '적합 / -', kfcNo: '', owner: 'Y',
+  cssApprove: '승인', cssReject: '', grade: '06 / 07 / 05 / 07 / 04', reviewType: '', cutoff: '승인 / 정상 / 간편 / 정상', finalReview: '',
+  ltv: '89.78 / 90', dti: '39.33 / 0', lti: '3470.28', ltiReq: 'N', baseRate: '2.38', addRate: '5.95', finalRate: '8.33', prefRate: '0.00', extraRate: '0.00', adjRate: '',
+  checker: '박페퍼'
+};
+const maskOf = (k, v) => {
+  if (!v || v === '-') return v;
+  if (k === 'name') return v[0] + '*' + v[v.length - 1];
+  if (k === 'phone') return v.replace(/-(\d{4})-/, '-****-');
+  if (k === 'email') return v.replace(/^(.{2})[^@]*/, '$1****');
+  if (/addr|home$|Addr/.test(k)) return v.replace(/\s[^\s]+$/, ' ****');
+  return v.replace(/[0-9A-Za-z가-힣]/g, (c, i) => (i < 3 ? c : '*'));
+};
+const PROVIDERS = ['', '_2'];
+Object.assign(D, Object.fromEntries(Object.keys(D).filter(k => /^p[A-Z]/.test(k)).map(k => [k + '_2', D[k]])), {
+  pRel_2: '자녀', pOwnType_2: '공동소유', pReqAt_2: '2022-08-18 15:04:37', pRegAt_2: '2022-08-19 09:12:05', pOs_2: 'iOS', pLastAt_2: '2022-08-24 13:02:44',
+  pJob_2: '학생', pJobKind_2: '기타', pConsent_2: 'Y / Y / Y / Y', pFund_2: '기타', pStage_2: '본인확인완료', pSavedAt_2: '2022-08-24 13:05:10',
+  pSignAt_2: '', pSignBy_2: '', pIdAt1_2: '2022-08-24 13:01:12', pIdAt2_2: '2022-08-24 13:02:03', pIdErr2_2: '1', pIdAt3_2: '2022-08-24 13:02:40',
+});
+const PANEL = { id1: 'identity', id2: 'identity', id3: 'identity', cBankP: 'cost', cCustP: 'cost' };
+const TITLES = { member: '회원정보', apply: '신청현황', loan: '신청정보', customer: '고객정보', biz: '사업장 정보', income: '소득정보', tax: '인지세/국민주택채권', contract: '전자약정', identity: '본인확인', limit: '한도산출정보', rate: '금리정보', pMember: '담보제공자정보', pCustomer: '담보제공자 고객정보', cSendP: '송금정보', cost: '비용상세', col: '담보정보' };
+const ME = '절삼규(280820)';
+const TI_OPTS = [
+  ['tiRegType', '등기유형', ['오프라인등기', '전자등기']],
+  ['tiDeed', '등기권리증 유무', ['확인서면', '구권리증', '신권리증']],
+  ['tiLeaseSurvey', '임대차현장조사', ['현장조사진행', '현장조사 미진행', '비대면조사']],
+];
+const pad = (n) => String(n).padStart(2, '0');
+const nowStr = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); };
+const SEED_HISTORY = [
+  { at: '2026-08-30 16:21:07', section: '사업장 정보', item: '연매출금액', before: '98,500,000', after: '106,062,209', by: '박책임(270115)' },
+  { at: '2026-08-28 10:02:44', section: '고객정보', item: '우편물수령지', before: '직장주소', after: '현재거주지주소', by: '김상담(281102)' },
+  { at: '2026-08-27 14:40:13', section: '신청정보', item: '신청금액', before: '30,000,000', after: '26,000,000', by: '박책임(270115)' },
+  { at: '2026-08-25 09:15:30', section: '소득정보', item: '소득산정방법', before: '증빙소득', after: '매출액추정소득', by: '박책임(270115)' },
+];
+const CHECKS = ['대환계좌 잔액변동 차이가 일정금액 이상', '신청 3개월 이내 전액 상환한 주담대가 존재', '담보물 취득일자와 대환(이) 설정일자가 3개월 이내', '사업장 개업일 이전 발생 대출의 대환인 경우'];
+
+class Component extends DCLogic {
+  state = { lienDraft: {}, editing: null, draft: {}, vals: {}, histOpen: false, histFilter: '전체', history: SEED_HISTORY, tab: '상세정보', sub: null, lnbOpen: true, revealed: {}, checked: {}, query: '', ready: !!window.PepperDigitalAdminDesignSystem_0682d9 };
+  componentDidMount() {
+    if (!this.state.ready) this.t = setInterval(() => { if (window.PepperDigitalAdminDesignSystem_0682d9) { clearInterval(this.t); this.setState({ ready: true }); } }, 100);
+  }
+  componentWillUnmount() { clearInterval(this.t); }
+
+  renderVals() {
+    const NS = window.PepperDigitalAdminDesignSystem_0682d9;
+    const h = React.createElement;
+    const masked = this.props.masked ?? true;
+    const mk = {};
+    const { editing, draft, vals } = this.state;
+    const cv = (k) => vals[k] ?? D[k] ?? '';
+    const val = (k) => { const v = cv(k); return masked && mk[k] && !this.state.revealed[k] ? maskOf(k, v) : v; };
+    const labels = {};
+    let cur = null;
+    const sec = (p, fn) => { cur = PANEL[p] || p; return fn(); };
+    const field = (label, k, o = {}) => {
+      if (o.mask) mk[k] = true;
+      labels[k] = { label, panel: cur };
+      const ed = editing === cur;
+      if (!NS) return { label, span: o.span };
+      const input = h('div', { style: { position: 'relative', flex: 1, minWidth: 0 } },
+        h(NS.Input, { value: ed ? (draft[k] ?? cv(k)) : val(k), readOnly: !ed, align: o.unit || o.right ? 'right' : 'left', style: { display: 'block', width: '100%' }, inputStyle: o.unit ? { paddingRight: o.unit.length > 1 ? 34 : 22 } : undefined, onChange: ed ? (e) => { const v = e.target.value; this.setState(s => ({ draft: { ...s.draft, [k]: v } })); } : () => {} }),
+        o.unit ? h('span', { style: { position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: '#707070', pointerEvents: 'none' } }, o.unit) : null);
+      const extra = [];
+      if (o.mask && !ed) extra.push(h(NS.Button, { key: 'm', variant: 'outline', size: 'sm', style: { width: 24, padding: 0, flexShrink: 0 }, onClick: () => this.setState(s => ({ revealed: { ...s.revealed, [k]: !s.revealed[k] } })) }, '*'));
+      if (o.reset) extra.push(h(NS.Button, { key: 'r', variant: 'danger', size: 'sm', style: { flexShrink: 0 } }, '초기화'));
+      if (o.btn) extra.push(h(NS.Button, { key: 'b', variant: 'outline', size: 'sm', style: { flexShrink: 0 } }, o.btn));
+      return { label, span: o.span, render: h('div', { style: { display: 'flex', alignItems: 'center', gap: 4 } }, input, ...extra) };
+    };
+    const blank = (n = 1) => ({ raw: '', colSpan: n * 2 });
+    const note = (t, n = 1) => ({ raw: h('span', { style: { fontSize: 12, color: '#707070', paddingLeft: 5 } }, t), colSpan: n * 2 });
+    const btns = (...items) => NS ? h('div', { style: { display: 'flex', gap: 4 } }, ...items.map((t, i) => h(NS.Button, { key: i, variant: 'outline', size: 'sm' }, t))) : null;
+
+    const histRows = this.state.history.filter(x => this.state.histFilter === '전체' || x.section === this.state.histFilter);
+    const save = (p) => {
+      const changes = Object.keys(draft).filter(k => labels[k] && labels[k].panel === p && draft[k] !== cv(k));
+      const at = nowStr();
+      const entries = changes.map(k => ({ at, section: TITLES[p], item: labels[k].label, before: cv(k) || '-', after: draft[k] || '-', by: ME }));
+      this.setState(s => ({ editing: null, draft: {}, vals: { ...s.vals, ...Object.fromEntries(changes.map(k => [k, draft[k]])) }, history: [...entries, ...s.history] }));
+    };
+    const ea = (p, ...extras) => {
+      if (!NS) return null;
+      const row = (...kids) => h('div', { style: { display: 'flex', gap: 4 } }, ...kids);
+      if (editing === p) return row(
+        h(NS.Button, { key: 'c', variant: 'outline', size: 'sm', onClick: () => this.setState({ editing: null, draft: {} }) }, '취소'),
+        h(NS.Button, { key: 's', variant: 'primary', size: 'sm', onClick: () => save(p) }, '저장'));
+      return row(...extras.map((t, i) => h(NS.Button, { key: i, variant: 'outline', size: 'sm' }, t)),
+        h(NS.Button, { key: 'e', variant: 'outline', size: 'sm', disabled: !!editing, onClick: () => this.setState({ editing: p, draft: {} }) }, '수정'));
+    };
+    const eaH = (p, editLabel, histLabel) => {
+      if (!NS) return null;
+      const row = (...kids) => h('div', { style: { display: 'flex', gap: 4 } }, ...kids);
+      if (editing === p) return ea(p);
+      return row(
+        h(NS.Button, { key: 'e', variant: 'outline', size: 'sm', disabled: !!editing, onClick: () => this.setState({ editing: p, draft: {} }) }, editLabel),
+        h(NS.Button, { key: 'h', variant: 'outline', size: 'sm', onClick: () => this.setState({ histOpen: true, histFilter: TITLES[p] }) }, histLabel));
+    };
+    const lienRows = this.state.lienRows || [{ org: '주식회사하나은행', date: '2021-04-30', amt: '90,200,000', bal: '-', refi: 'B', addDel: 'B', cancel: false }];
+    const lienEditing = !!this.state.lienEditing;
+    const saveLien = () => {
+      const at = nowStr(), entries = [];
+      const next = lienRows.map((l, i) => {
+        const d = { ...l, ...((this.state.lienDraft || {})[i] || {}) };
+        [['amt', '설정금액'], ['bal', '대출잔액'], ['cancel', '말소']].forEach(([k, lb]) => {
+          if (d[k] !== l[k]) entries.push({ at, section: '담보설정정보', item: `${lb}(${i + 1})`, before: k === 'cancel' ? (l[k] ? 'Y' : 'N') : l[k], after: k === 'cancel' ? (d[k] ? 'Y' : 'N') : d[k], by: ME });
+        });
+        return d;
+      });
+      this.setState(s => ({ lienRows: next, lienEditing: false, lienDraft: {}, history: [...entries, ...s.history] }));
+    };
+    const lienAct = !NS ? null : lienEditing
+      ? h('div', { style: { display: 'flex', gap: 4 } },
+          h(NS.Button, { key: 'c', variant: 'outline', size: 'sm', onClick: () => this.setState({ lienEditing: false, lienDraft: {} }) }, '취소'),
+          h(NS.Button, { key: 's', variant: 'primary', size: 'sm', onClick: saveLien }, '저장'))
+      : h(NS.Button, { variant: 'outline', size: 'sm', disabled: !!editing, onClick: () => this.setState({ lienEditing: true, lienDraft: {} }) }, '+');
+    const tiSaved = this.state.tiSaved || { tiRegType: '전자등기', tiDeed: '', tiLeaseSurvey: '' };
+    const tiCur = { ...tiSaved, ...(this.state.tiDraft || {}) };
+    const tiChanged = TI_OPTS.filter(([k]) => (tiCur[k] || '') !== (tiSaved[k] || ''));
+    const saveTi = () => {
+      if (!tiChanged.length) return;
+      const at = nowStr();
+      const entries = tiChanged.map(([k, label]) => ({ at, section: '권원보험 설정 정보', item: label, before: tiSaved[k] || '-', after: tiCur[k] || '-', by: ME }));
+      this.setState(s => ({ tiSaved: tiCur, tiDraft: {}, history: [...entries, ...s.history] }));
+    };
+    const tiAct = !NS ? null : h('div', { style: { display: 'flex', gap: 4 } },
+      h(NS.Button, { key: 'req', variant: 'outline', size: 'sm' }, '권원보험 요청'),
+      h(NS.Button, { key: 'save', variant: 'primary', size: 'sm', disabled: !tiChanged.length, onClick: saveTi }, '저장'));
+    const r = {
+      member: sec('member', () => [
+        [field('고객명', 'name', { mask: true }), field('회원구분', 'memberType'), field('회원상태', 'memberStatus')],
+        [field('회원번호', 'memberNo'), field('휴대폰', 'phone', { mask: true }), field('생년월일', 'birth')],
+        [field('등록일시', 'regAt'), field('모바일OS', 'os'), field('최종접속일시', 'lastAt')],
+        [field('특수관계대상', 'special'), field('특수관계확인일', 'specialAt'), field('특수관계확인자', 'specialBy')],
+      ]),
+      apply: sec('apply', () => [
+        [field('유입채널', 'channel'), field('신청번호', 'applyNo'), field('신청일시', 'applyAt')],
+        [field('신청상태', 'applyStatus'), field('최종진행단계', 'stage'), field('최종저장일시', 'savedAt')],
+      ]),
+      loan: sec('loan', () => [
+        [field('상품명', 'product', { span: 2 }), field('대출구분', 'loanType')],
+        [field('신청금액', 'reqAmt', { unit: '원' }), field('승인금액', 'apprAmt', { unit: '원' }), field('최종승인한도', 'maxLimit', { unit: '원' })],
+        [field('설정금액', 'setAmt', { unit: '원' }), field('상환방식', 'repay'), field('대출/거치기간', 'period', { unit: '개월' })],
+        [field('금리변동구분', 'rateType'), field('금리변동주기', 'rateCycle', { unit: '개월' }), field('중도상환수수료율', 'earlyFee', { right: true })],
+        [field('대출실행일', 'loanDate', { right: true }), field('대출만기일', 'dueDate', { right: true }), field('결제일', 'payDay', { right: true })],
+      ]),
+      biz: sec('biz', () => [
+        [field('사업장명', 'bizName'), field('사업자번호', 'bizNo'), field('휴폐업여부', 'closed')],
+        [field('사업장주소', 'bizAddr', { span: 2, mask: true }), field('사업장전화번호', 'bizTel', { mask: true })],
+        [field('업종', 'industry'), field('단순경비율', 'expRate', { unit: '%' }), field('사업연속성인정', 'continuity')],
+        [field('개업일자', 'openDate'), field('사업자등록일', 'bizRegDate'), field('운영기간', 'opPeriod', { unit: '개월' })],
+        [field('과세구분', 'taxType'), field('매출확인방법', 'salesMethod'), field('연매출금액', 'sales', { unit: '원' })],
+        [field('공동사업자여부', 'joint'), field('공동사업자', 'partners'), field('사업지분율', 'share', { unit: '%' })],
+        [field('지분취득일', 'shareDate'), blank(2)],
+      ]),
+      income: sec('income', () => [[field('소득종류', 'incomeType'), field('소득산정방법', 'incomeMethod'), field('연소득금액', 'income', { unit: '원' })]]),
+      tax: sec('tax', () => [[field('인지세 면제 대상 여부', 'stampTax', { btn: '체크리스트' }), field('국민주택채권 매입 면제 대상 여부', 'bond', { btn: '체크리스트' })]]),
+      contract: sec('contract', () => [[field('약정완료일시', 'signAt'), field('약정서명수단', 'signBy'), field('CMS서명수단', 'cmsBy')]]),
+      id1: sec('id1', () => [[field('인증요청일시', 'idAt1'), field('성공여부', 'idOk1'), field('누적오류횟수', 'idErr1', { reset: true, right: true })]]),
+      id2: sec('id2', () => [[field('인증요청일시', 'idAt2'), field('성공여부', 'idOk2'), field('누적오류횟수', 'idErr2', { reset: true, right: true })]]),
+      id3: sec('id3', () => [[field('인증요청일시', 'idAt3'), field('성공여부', 'idOk3'), field('누적오류횟수', 'idErr3', { reset: true, right: true })]]),
+      input: sec('input', () => [
+        [field('개업일자', 'inOpen'), field('운영기간', 'inMonths', { unit: '개월' }), field('연매출금액', 'inSales', { unit: '원' })],
+        [field('공동/법인사업자 여부', 'inJoint'), field('압류/체납여부', 'inSeize'), field('실거주여부', 'inReside')],
+        [field('후순위대출여부', 'inSub'), blank(2)],
+      ]),
+      transfer: sec('transfer', () => [
+        [field('이관여부', 'trYn'), field('이관사유', 'trReason', { span: 2 })],
+        [field('이관대상여부', 'trTarget'), field('이관일자', 'trDate'), field('이관신청번호', 'trNo')],
+        [field('처리결과', 'trResult'), field('처리상세', 'trDetail'), blank()],
+      ]),
+      title: sec('title', () => [[field('권원청약상태', 'titleStatus'), field('전자등기상태', 'regStatus'), blank()]]),
+      exec1: sec('exec', () => [
+        [field('실행일시', 'xExecAt'), field('진행상태', 'xStatus'), field('실행중단사유', 'xStop')],
+        [field('수동실행여부', 'xManual'), field('수동실행자', 'xManualBy'), field('강제실행여부', 'xForce')],
+        [field('강제실행설명', 'xForceDesc', { span: 2 }), blank()],
+      ]),
+      exec2: sec('exec', () => [
+        [field('기표완료일시', 'xDoneAt'), blank(2)],
+        [field('계좌번호', 'xAcct'), field('고객번호', 'xCustNo'), blank()],
+        [field('대출금액', 'xAmt', { unit: '원' }), field('대출실행일', 'xLoanDate'), field('대출만기일', 'xDueDate')],
+        [field('대출기간', 'xMonths', { unit: '개월' }), field('거치기간', 'xGrace', { unit: '개월' }), field('상환방식', 'xRepay')],
+        [field('금리변동구분', 'xRateType'), field('금리변동주기', 'xRateCycle', { unit: '개월' }), field('연체이율', 'xOverdue', { unit: '%' })],
+        [field('결제일', 'xPayDay', { unit: '일' }), field('회차별상환금', 'xInstall', { unit: '원' }), field('중도수수료율', 'xEarly', { unit: '%' })],
+        [field('CMS은행', 'xCmsBank'), field('CMS계좌번호', 'xCmsAcct', { mask: true }), field('CMS수취인명', 'xCmsName', { mask: true })],
+        [field('대출송금은행', 'xSendBank'), field('송금계좌번호', 'xSendAcct', { mask: true }), field('송금수취인명', 'xSendName', { mask: true })],
+      ]),
+      pMember: sec('pMember', () => [
+        [field('성명', 'pName', { mask: true }), field('회원구분', 'pType'), field('회원상태', 'pStatus')],
+        [field('회원번호', 'pNo'), field('휴대폰', 'pPhone', { mask: true }), field('생년월일', 'pBirth')],
+        [field('등록일시', 'pRegAt'), field('모바일OS', 'pOs'), field('최종접속일시', 'pLastAt')],
+        [field('관계', 'pRel'), field('소유형태', 'pOwnType'), field('담보제공요청일시', 'pReqAt')],
+      ]),
+      pCustomer: sec('pCustomer', () => [
+        [field('자택주소', 'pHome', { span: 2, mask: true }), field('자택전화번호', 'pHomeTel')],
+        [field('등본주소', 'pRegAddr', { span: 2, mask: true }), blank()],
+        [field('직업구분', 'pJob'), field('직종', 'pJobKind'), field('이메일', 'pEmail', { mask: true })],
+        [field('우편물수령지', 'pMail'), field('수신동의여부', 'pConsent'), note('(SMS / 알림톡 / 이메일 / PUSH)')],
+        [field('거래목적', 'pPurpose'), field('거래자금원천', 'pFund'), field('불법수수료안내', 'pFee')],
+        [field('실소유자여부', 'pOwner'), blank(2)],
+      ]),
+      pStatus: sec('pStatusP', () => [[field('최종진행단계', 'pStage'), field('최종저장일시', 'pSavedAt'), blank()]]),
+      pContract: sec('pContractP', () => [[field('약정완료일시', 'pSignAt'), field('전자서명수단', 'pSignBy'), blank()]]),
+      pCollateral: sec('pCollateralP', () => [[field('IFIS 담보번호', 'pIfis'), field('조회일', 'pIfisDate')]]),
+      col: sec('col', () => [
+        [field('IFIS 담보번호', 'kIfis'), blank(), field('조회일', 'kIfisDate')],
+        [field('부동산고유번호', 'kUid'), field('담보종류', 'kType'), field('등기부면적', 'kArea', { unit: '㎡' })],
+        [field('소재지주소', 'kAddr', { span: 3, mask: true })],
+        [field('등기여부', 'kReg'), field('취득일자', 'kAcq'), field('대지권소유비율', 'kLandRatio', { unit: '%' })],
+        [field('총방수', 'kRooms', { right: true }), field('세대수/총동수', 'kUnits', { right: true }), field('거주층/총층', 'kFloor', { right: true })],
+        [field('담보등급', 'kGrade'), field('규제별지역', 'kZone'), field('최우선변제', 'kPrior', { unit: '원' })],
+        [field('권리침해여부', 'kInfr'), field('침해해지이력', 'kInfrHist'), field('신청사건처리중', 'kCase')],
+        [field('감정기관', 'kOrg'), field('담보가액', 'kValue', { unit: '원' }), field('담보평가일자', 'kEvalDate')],
+      ]),
+      tenant: sec('tenantP', () => [
+        [field('임차인명', 'tName', { mask: true }), field('임차시작일', 'tStart'), field('임차만료일', 'tEnd')],
+        [field('임차인 선/후순위', 'tRank'), field('전/월세', 'tKind'), field('권리구분', 'tRight')],
+        [field('전세권 설정유무', 'tJeonse'), field('전세권설정일', 'tJeonseDate'), field('임차보증금', 'tDeposit', { unit: '원' })],
+        [field('임대차 확정유무', 'tFixed'), field('임대차확정일', 'tFixedDate'), field('월세', 'tRent', { unit: '원' })],
+        [field('임차권 설정여부', 'tLease'), field('임차권설정일', 'tLeaseDate'), blank()],
+      ]),
+      tiSet: sec('tiSetP', () => [
+        [field('청약일시', 'tiReqAt'), field('권원보험단계', 'tiStep'), field('진행상태', 'tiStatus')],
+        [field('최종전문처리일시', 'tiLastAt'), field('오류내용', 'tiErr'), field('확인서발행일', 'tiCertDate')],
+        [field('보험증권번호', 'tiPolicy'), blank(), field('보험가입금액', 'tiAmt', { unit: '원' })],
+      ]),
+      tiOpt: !NS ? [] : [TI_OPTS.map(([k, label, opts]) => ({
+        label,
+        render: h(NS.Select, {
+          options: ['선택하세요', ...opts], width: '100%', style: { display: 'block', width: '100%' },
+          value: tiCur[k] || '선택하세요',
+          onChange: (e) => { const v = e.target.value; this.setState(s => ({ tiDraft: { ...(s.tiDraft || {}), [k]: v === '선택하세요' ? '' : v } })); },
+        }),
+      }))],
+      tiReg: sec('tiRegP', () => [
+        [field('권리침해여부', 'tiInfr'), field('신청사건처리중', 'tiCase'), field('전자등기가능여부', 'tiEreg')],
+        [field('이상여부', 'tiRegAbn'), blank(2)],
+      ]),
+      tiMove: sec('tiMoveP', () => [[field('이상여부', 'tiMoveAbn'), blank(2)]]),
+      cAcct: sec('cAcctP', () => [
+        [field('CMS은행', 'cCmsBank'), field('CMS계좌번호', 'cCmsAcct', { mask: true }), field('CMS수취인명', 'cCmsName', { mask: true })],
+        [field('대출송금은행', 'cSendBank'), field('송금계좌번호', 'cSendAcct', { mask: true }), field('송금수취인명', 'cSendName', { mask: true })],
+      ]),
+      cSend: sec('cSendP', () => [[field('송금방법', 'cMethod'), field('송금구분', 'cSendType'), blank()]]),
+      cBank: sec('cBankP', () => [
+        [field('인지세', 'cbStamp', { unit: '원' }), field('권원보험료', 'cbTitle', { unit: '원' }), field('법무비용합계', 'cbLegal', { unit: '원' })],
+        [field('등록세', 'cbReg', { unit: '원' }), field('교육세', 'cbEdu', { unit: '원' }), field('증지', 'cbSeal', { unit: '원' })],
+        [field('교통비', 'cbTrans', { unit: '원' }), field('전입조사비', 'cbSurvey', { unit: '원' }), field('기타', 'cbEtc', { unit: '원' })],
+      ]),
+      cCust: sec('cCustP', () => [
+        [field('인지세', 'ccStamp', { unit: '원' }), field('제비용합계', 'ccFees', { unit: '원' }), field('채권비', 'ccBond', { unit: '원' })],
+        [field('주소변경', 'ccAddr', { unit: '원' }), field('기타', 'ccEtc', { unit: '원' }), blank()],
+      ]),
+      customer: sec('customer', () => [
+        [field('자택주소', 'home', { span: 2, mask: true }), field('자택전화번호', 'homeTel')],
+        [field('등본주소', 'regAddr', { span: 2, mask: true }), blank()],
+        [field('직업구분', 'job'), field('직종', 'jobKind'), field('이메일', 'email', { mask: true })],
+        [field('우편물수령지', 'mailTo'), field('수신동의여부', 'consent'), note('(SMS / 알림톡 / 이메일 / PUSH)')],
+        [field('거래목적', 'purpose', { mask: true }), field('거래자금원천', 'fund'), field('불법수수료안내', 'feeNotice')],
+        [field('금소법결과', 'kfcResult', { mask: true }), field('금소법관리번호', 'kfcNo'), field('실소유자여부', 'owner')],
+      ]),
+      limit: sec('limit', () => [
+        [field('CSS승인구분', 'cssApprove'), field('CSS거절사유', 'cssReject', { span: 2 })],
+        [field('등급', 'grade'), note('(NICE / KCB / AS / ExML / 통합RISK)'), field('심사구분', 'reviewType')],
+        [field('CUTOFF', 'cutoff'), note('(CUTOFF / CFS / 상품 / 거절)'), field('최종심사구분', 'finalReview')],
+        [field('LTV/최대LTV', 'ltv', { unit: '%' }), field('DTI/최대DTI', 'dti', { unit: '%' }), field('LTI', 'lti', { unit: '%' })],
+        [field('LTI필수대상', 'ltiReq'), blank(2)],
+      ]),
+      rate: sec('rate', () => [
+        [field('기준금리', 'baseRate', { unit: '%' }), field('가산금리', 'addRate', { unit: '%' }), field('최종적용금리', 'finalRate', { unit: '%' })],
+        [field('우대금리', 'prefRate', { unit: '%' }), field('추가금리', 'extraRate', { unit: '%' }), field('조정금리', 'adjRate', { unit: '%' })],
+      ]),
+      precheck: sec('precheck', () => [[field('책임자', 'checker'), blank()]]),
+    };
+
+    const loans = [
+      { name: '[주택]페퍼홈론(원리금균등)', status: '실행', bal: '28,000,000', bs: '01', date: '2023-02-05', rate: '7.28', fund: '가계', color: '#303030' },
+      { name: '[주택]페퍼비즈니스론(만기일시)', status: '완제(해지)', bal: '0', bs: '02', date: '2025-05-03', rate: '11.05', fund: '기업운전', color: '#707070' },
+    ];
+    const cautions = [
+      { reg: '2026-09-01', reason: '새출발기금매각', release: '-', yn: 'N', color: 'var(--bs-danger, #dc3545)' },
+      { reg: '2026-01-05', reason: '자산건전성요주의이하', release: '2026-05-02', yn: 'Y', color: '#707070' },
+    ];
+    const active = cautions.filter(c => c.yn === 'N').length;
+    const nChecked = CHECKS.filter((_, i) => this.state.checked[i]).length;
+    const subTabs = [
+      { value: 'loans', label: `당행기대출정보 (${loans.length})` },
+      { value: 'precheck', label: `사전조사 책임자 확인 (${nChecked}/${CHECKS.length})` },
+      { value: 'caution', label: active ? `유의고객 (미해제 ${active})` : `유의고객 (${cautions.length})` },
+    ];
+    const sub = this.state.sub ?? this.props.defaultSubTab ?? 'loans';
+    const L = (label, id) => ({ label, id });
+
+    return {
+      r, loans, cautions, subTabs, sub,
+      isProvider: this.state.tab === '담보정보',
+      isCollateral: this.state.tab === '담보정보',
+      isCost: this.state.tab === '실행정보',
+      costGridRef: this.costGridRef || (this.costGridRef = React.createRef()),
+      costCols: (() => { const p = this.state.costRatio ?? 0.5; return `minmax(0,${p}fr) 14px minmax(0,${1 - p}fr)`; })(),
+      costSelect: this.state.costDragging ? 'none' : 'auto',
+      costBarColor: this.state.costDragging ? '#5c6284' : '#dedede',
+      costReset: () => this.setState({ costRatio: 0.5 }),
+      costDragStart: (e) => {
+        e.preventDefault();
+        const el = this.costGridRef && this.costGridRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const move = (ev) => this.setState({ costRatio: Math.min(0.75, Math.max(0.25, (ev.clientX - rect.left) / rect.width)) });
+        const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); this.setState({ costDragging: false }); };
+        window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+        this.setState({ costDragging: true });
+      },
+      tiDirty: tiChanged.length > 0,
+      tiCancel: this.state.tiAction === 'cancel', tiOffline: (this.state.tiAction ?? 'offline') === 'offline',
+      setTiCancel: () => this.setState({ tiAction: 'cancel' }), setTiOffline: () => this.setState({ tiAction: 'offline' }),
+      tiReasons: ['선택하세요', '고객요청', '심사부결', '서류미비', '기타'],
+      tiMsgs: [
+        ['FTC_0400800', '상환결과', '종료', '2022-09-01 14:20:03'], ['FTC_0400800', '상환결과', '종료', '2022-09-01 14:20:01'],
+        ['FTC_0200700', '실행통지', '실행통지', '2022-08-17 13:23:41'], ['FTC_0400500', '확인서', '종료', '2022-08-17 10:26:18'],
+        ['FTC_0400400', '비용내역', '비용발급완료', '2022-08-17 10:25:32'], ['FTC_0400300', '전입조사결과', '전입조사완료', '2022-08-17 10:25:16'],
+        ['FTC_0400200', '등기부조사결과', '등기부조사완료', '2022-08-11 17:53:37'], ['FTC_0400200', '등기부조사결과', '등기부조사완료', '2022-08-11 17:53:36'],
+        ['FTC_0200100', '청약의뢰', '청약의뢰', '2022-08-11 17:49:36'],
+      ].map(([code, kind, step, at], i, a) => ({ no: String(i + 1), code, kind, step, at, ok: 'Y', resend: i === a.length - 1 })),
+      remits: [
+        { no: '1', type: '법무사(제비용)', bank: 'SC은행', acct: '1172-****-777', holder: '○○법무사사무소', at: '2022-08-18 11:17:36', amt: '34,231', done: 'Y' },
+        { no: '2', type: '법무사(법무비용)', bank: 'SC은행', acct: '1172-****-777', holder: '○○법무사사무소', at: '2022-08-18 11:17:34', amt: '96,880', done: 'Y' },
+        { no: '3', type: '권원', bank: 'SC은행', acct: '1002-****-413', holder: '○○권원보험', at: '2022-08-18 11:17:32', amt: '98,946', done: 'Y' },
+      ],
+      remitTotal: '230,057', remitMeta: '3건',
+      bankTotal: '합계 ' + ['cbStamp', 'cbTitle', 'cbLegal', 'cbReg', 'cbEdu', 'cbSeal', 'cbTrans', 'cbSurvey', 'cbEtc'].reduce((t, k) => t + (parseInt(String(cv(k)).replace(/[^0-9-]/g, ''), 10) || 0), 0).toLocaleString('ko-KR') + '원',
+      custTotal: '합계 ' + ['ccStamp', 'ccFees', 'ccBond', 'ccAddr', 'ccEtc'].filter(k => k !== 'ccFees').reduce((t, k) => t + (parseInt(String(cv(k)).replace(/[^0-9-]/g, ''), 10) || 0), 0).toLocaleString('ko-KR') + '원',
+      providerCount: `(${PROVIDERS.length}명)`,
+      expandAllP: () => this.setState({ pCollapsed: {} }),
+      collapseAllP: () => this.setState({ pCollapsed: Object.fromEntries(PROVIDERS.map((_, i) => [i, true])) }),
+      providers: PROVIDERS.map((sx, i) => {
+        const k = (b) => b + sx;
+        const open = !(this.state.pCollapsed || {})[i];
+        const custP = 'pCustomer' + sx;
+        TITLES[custP] = `담보제공자${i + 1} 고객정보`;
+        return {
+          no: String(i + 1), open,
+          toggleLabel: open ? '접기' : '펼치기', caret: open ? 'rotate(180deg)' : 'rotate(0deg)',
+          summary: `${cv(k('pRel'))} · ${cv(k('pOwnType'))} · ${cv(k('pStage'))}`,
+          toggle: () => this.setState(s => ({ pCollapsed: { ...(s.pCollapsed || {}), [i]: open } })),
+          member: sec('pMember' + sx, () => [
+            [field('성명', k('pName'), { mask: true }), field('회원구분', k('pType')), field('회원상태', k('pStatus'))],
+            [field('회원번호', k('pNo')), field('휴대폰', k('pPhone'), { mask: true }), field('생년월일', k('pBirth'))],
+            [field('등록일시', k('pRegAt')), field('모바일OS', k('pOs')), field('최종접속일시', k('pLastAt'))],
+            [field('관계', k('pRel')), field('소유형태', k('pOwnType')), field('담보제공요청일시', k('pReqAt'))],
+          ]),
+          customer: sec(custP, () => [
+            [field('자택주소', k('pHome'), { span: 2, mask: true }), field('자택전화번호', k('pHomeTel'))],
+            [field('등본주소', k('pRegAddr'), { span: 2, mask: true }), blank()],
+            [field('직업구분', k('pJob')), field('직종', k('pJobKind')), field('이메일', k('pEmail'), { mask: true })],
+            [field('우편물수령지', k('pMail')), field('수신동의여부', k('pConsent')), note('(SMS / 알림톡 / 이메일 / PUSH)')],
+            [field('거래목적', k('pPurpose')), field('거래자금원천', k('pFund')), field('불법수수료안내', k('pFee'))],
+            [field('실소유자여부', k('pOwner')), blank(2)],
+          ]),
+          customerAct: eaH(custP, '고객정보 수정', '변경이력조회'),
+          status: sec('pStatusP' + sx, () => [[field('최종진행단계', k('pStage')), field('최종저장일시', k('pSavedAt')), blank()]]),
+          contract: sec('pContractP' + sx, () => [[field('약정완료일시', k('pSignAt')), field('전자서명수단', k('pSignBy')), blank()]]),
+          idBlocks: [['신분증진위확인', 1], ['타행계좌인증', 2], ['안면인식인증', 3]].map(([t, n], j) => ({
+            opts: [t], border: j ? '1px solid #dee2e6' : 'none', pad: j ? '10px' : '0px',
+            rows: sec('pId' + sx, () => [[field('인증요청일시', k('pIdAt' + n)), field('성공여부', k('pIdOk' + n)), field('누적오류횟수', k('pIdErr' + n), { reset: true, right: true })]]),
+          })),
+        };
+      }),
+      pIdBlocks: [['신분증진위확인', 1], ['타행계좌인증', 2], ['안면인식인증', 3]].map(([t, n], i) => ({
+        opts: [t], border: i ? '1px solid #dee2e6' : 'none', pad: i ? '10px' : '0px',
+        rows: sec('pId', () => [[field('인증요청일시', 'pIdAt' + n), field('성공여부', 'pIdOk' + n), field('누적오류횟수', 'pIdErr' + n, { reset: true, right: true })]]),
+      })),
+      prices: [
+        { no: '1', org: 'KB시세', date: '2022-08-10', low: '137,500,000', mid: '-', high: '-' },
+        { no: '2', org: '정식감정', date: '2026-09-09', low: '-', mid: '150,000,000', high: '-' },
+      ],
+      owners: [{ no: '1', name: masked ? '○○○' : '', type: '본인 단독 소유', share: '100' }],
+      liens: lienRows.map((l, i) => {
+        const d = lienEditing ? { ...l, ...(this.state.lienDraft[i] || {}) } : l;
+        const set = (patch) => this.setState(s => ({ lienDraft: { ...s.lienDraft, [i]: { ...(s.lienDraft[i] || {}), ...patch } } }));
+        return { ...d, no: String(i + 1), debtor: '○○○', editing: lienEditing, viewing: !lienEditing,
+          cancel: !!d.cancel, disabled: !lienEditing, toggle: (v) => lienEditing && set({ cancel: typeof v === 'boolean' ? v : !d.cancel }),
+          amtProps: { value: d.amt, align: 'right', onChange: (e) => set({ amt: e.target.value }), style: { width: '100%' } },
+          balProps: { value: d.bal, align: 'right', onChange: (e) => set({ bal: e.target.value }), style: { width: '100%' } } };
+      }),
+      kbOpen: !!this.state.kbOpen,
+      closeKb: () => this.setState({ kbOpen: false }),
+      kbFooter: NS ? h(NS.Button, { variant: 'primary', onClick: () => this.setState({ kbOpen: false }) }, '닫기') : null,
+      kbMeta: '조회일시 2026-09-22 09:33:27 · 조회요청자 210083',
+      kbHead: [{ l: '기준일자', v: '2026-09-18' }, { l: 'KB시세ID', v: 'KBA029225_2' }, { l: '물건식별자', v: 'KBA029225' }, { l: '평형일련번호', v: '2' }],
+      kbRows: [
+        ['단지명', '', '도로기본주소', ''], ['공급면적', '112.24', '도로명건물부번', 'Y'], ['평형구분', 'B', '도로상세주소', ''],
+        ['전용면적', '84.9', '우편번호', ''], ['기타전용면적', '', '시도명', '경기도'], ['매매하한가', '420,000,000', '시군구명', '김포시'],
+        ['매매일반거래가', '445,000,000', '구명', ''], ['매매상한가', '455,000,000', '읍면동명', ''], ['총세대수', '439', '리명', ''],
+        ['총동수', '7', '번지', ''], ['단지최고층', '21', '기타번지', ''], ['방수', '3', '평형 세대수', '262'],
+      ].map(([l1, v1, l2, v2]) => ({ l1, v1, l2, v2 })),
+      secLoans: `당행기대출정보 (${loans.length}건)`,
+      secPre: `사전조사 책임자 확인내용 (${nChecked}/${CHECKS.length})`,
+      secCaution: active ? `유의고객 (미해제 ${active}건)` : `유의고객 (${cautions.length}건)`,
+      idOpts3: ['안면인식'],
+      setSub: (v) => this.setState({ sub: v }),
+      s: { loans: sub === 'loans', precheck: sub === 'precheck', caution: sub === 'caution' },
+      checks: CHECKS.map((label, i) => ({ label, checked: !!this.state.checked[i], toggle: (v) => this.setState(s => ({ checked: { ...s.checked, [i]: typeof v === 'boolean' ? v : !s.checked[i] } })) })),
+      tree: [
+        { label: '회원', children: [L('회원조회')] },
+        { label: '여신', open: true, children: [
+          L('요약정보'),
+          { label: '개인신용', children: [L('대출신청 목록')] },
+          { label: '모기지', open: true, children: [
+            { label: '간편한도조회', children: [L('간편한도조회 목록')] },
+            { label: '대출신청', open: true, children: [L('대출신청 목록', 'list'), L('대출신청 상세정보', 'detail'), L('대출신청 서류접수 목록'), L('정밀심사 대상 목록'), L('대출실행 대상 목록'), L('대출실행 목록')] },
+            L('모기지 이관 목록'),
+          ] },
+          { label: '오토', children: [L('대출신청 목록')] },
+          { label: '예적금 담보대출', children: [L('대출신청 목록')] },
+          { label: '사후관리', children: [L('연체관리')] },
+        ] },
+        { label: '수신', children: [L('예금계좌조회')] },
+        { label: '고객지원', children: [L('상담이력')] },
+        { label: '마케팅', children: [L('캠페인')] },
+        { label: '설정', children: [L('권한관리')] },
+        { label: '리포트', children: [L('일일보고서')] },
+        { label: '시스템', children: [L('코드관리')] },
+      ],
+      menu: ['회원', '여신', '수신', '고객지원', '마케팅', '설정', '리포트', '시스템'],
+      shortcuts: ['바로가기'], history: ['메뉴이력'], lnbTabs: ['업무메뉴', '즐겨찾기'],
+      lnbOpen: this.state.lnbOpen, setLnb: (v) => this.setState({ lnbOpen: v }),
+      mainPad: this.state.lnbOpen ? '20px 30px' : '20px 30px 20px 53px',
+      searchProps: { placeholder: '조회하려는 고객의 신청번호를 입력하세요.', value: this.state.query, readOnly: false, onChange: (e) => this.setState({ query: e.target.value }) },
+      tabs: ['상세정보', '담보정보', '한도조회이력', '서류제출', '신용정보', '채무현황', 'CSS정보', '실행정보', '이력조회'],
+      tab: this.state.tab, setTab: (v) => this.setState({ tab: v }),
+      isDetail: this.state.tab === '상세정보', notDetail: !['상세정보', '담보정보', '실행정보'].includes(this.state.tab),
+      idOpts1: ['신분증진위확인', '신분증OCR'], idOpts2: ['타행계좌인증', '휴대폰본인확인'],
+      act: {
+        member: null, terms: btns('약관동의내역'), loan: eaH('loan', '신청정보 수정', '변경이력조회'), biz: eaH('biz', '사업장정보 수정', '변경이력조회'), income: btns('소득계산'),
+        tax: null, contract: btns('전자약정조회', '확인서조회'), identity: btns('신분증 이미지', '본인확인이력', '안면인식이미지'),
+        customer: eaH('customer', '고객정보 수정', '변경이력조회'), limit: btns('한도산출 상세'), rate: btns('금리산출'),
+        pMember: null, lien: lienAct, tiSet: tiAct, pCustomer: eaH('pCustomer', '고객정보 수정', '변경이력조회'), cSend: ea('cSendP'), cost: ea('cost'), pTerms: btns('약관동의내역'),
+        col: ea('col', '등기부등본 조회', 'IFIS 담보번호조회'), tenant: btns('임차인 추가'), pPrice: NS ? h('div', { style: { display: 'flex', gap: 4 } },
+          h(NS.Button, { key: 'kb', variant: 'outline', size: 'sm', onClick: () => this.setState({ kbOpen: true }) }, 'KB시세상세열람'),
+          h(NS.Button, { key: 'h', variant: 'outline', size: 'sm' }, '시세변경이력'),
+          h(NS.Button, { key: 'q', variant: 'outline', size: 'sm' }, '시세조회')) : null, exec: btns('실행상세', '수동실행'),
+      },
+      histOpen: this.state.histOpen,
+      openHist: () => this.setState({ histOpen: true }),
+      closeHist: () => this.setState({ histOpen: false }),
+      histFooter: NS ? h(NS.Button, { variant: 'primary', onClick: () => this.setState({ histOpen: false }) }, '닫기') : null,
+      histOpts: ['전체', ...Object.values(TITLES)],
+      histFilter: this.state.histFilter,
+      setHistFilter: (e) => this.setState({ histFilter: e && e.target ? e.target.value : e }),
+      histRows, histCount: '총 ' + histRows.length + '건', noHist: histRows.length === 0,
+    };
+  }
+}
+</script>
+</body>
+</html>
