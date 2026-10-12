@@ -26,3 +26,6 @@ npm run build    # 타입체크 + dist/ 빌드
 - **텍스트 템플릿**: `{rows:loans}`, `{rowsWhere:cautions.yn=N}`, `{sum:a,b}`, `{checked:precheck}` 등으로 건수·합계를 상태에서 계산
 
 모든 변경은 메모리에만 저장되며 새로고침하면 초기화됩니다.
+
+## 단일 HTML로 보기
+`npm run build:single`을 실행하면 `preview/대출신청 상세정보 v3.html`이 다시 만들어집니다. 폰트·이미지까지 한 파일에 들어 있어 더블클릭으로 오프라인에서 열립니다.
