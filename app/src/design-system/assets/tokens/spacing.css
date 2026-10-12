@@ -1,0 +1,8 @@
+:root{
+/* helper scale: .new-p/m* classes run 5→100 in 5px steps */
+--space-0:0;--space-2:2px;--space-3:3px;--space-5:5px;--space-10:10px;--space-15:15px;--space-20:20px;--space-25:25px;--space-30:30px;--space-40:40px;--space-60:60px;
+/* layout */
+--header-height:50px;--lnb-width:282px;--layout-min-width:1860px;--content-pad-y:20px;--content-pad-x:30px;--grid-gutter:10px;--card-pad:15px;
+/* control sizes */
+--control-h:24px;--control-h-lg:40px;--control-h-layout:34px;--control-h-header:28px;--btn-min-w:54px;--btn-min-w-lg:100px;--tab-min-w:110px;--pill-min-w:90px;--grid-row-h:32px;--grid-header-h:40px;--check-size:18px;--step-circle:60px;
+}
