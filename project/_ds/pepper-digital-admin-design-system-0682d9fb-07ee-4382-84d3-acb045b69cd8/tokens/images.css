@@ -1,0 +1,21 @@
+/* Image-backed utility classes. URLs resolve relative to this file, so components can use them from any page. */
+.pp-img-checked{background:url('../assets/form/checked.png') 50%/100% no-repeat}
+.pp-img-checked-disabled{background:url('../assets/form/checked-disabled.png') 50%/100% no-repeat}
+.pp-img-radio{background:url('../assets/form/checked-radio.png') 50%/100% no-repeat}
+.pp-img-radio-disabled{background:url('../assets/form/checked-disabled-radio.png') 50%/100% no-repeat}
+.pp-img-clear{background:url('../assets/form/btn-clear.png') center/16px no-repeat}
+.pp-img-select-arrow{background-image:url('../assets/layout/icon_select_arrow.png');background-repeat:no-repeat;background-position:right 11px center}
+.pp-img-profile{background:url('../assets/layout/icon_profile.png') no-repeat center}
+.pp-img-lnb-plus{background:url('../assets/layout/btn_lnb_plus.png') no-repeat}
+.pp-img-lnb-minus{background:url('../assets/layout/btn_lnb_minus.png') no-repeat}
+.pp-img-lnb-arrow{background:url('../assets/layout/btn_lnb_arrow.png') no-repeat center/6px}
+.pp-img-lnb-vdot{background:url('../assets/layout/icon-lnb-linedot.png') top center repeat-y}
+.pp-img-lnb-hdot{background:url('../assets/layout/icon-lnb-linedot_x.png') repeat-x;background-position-y:.6em}
+.pp-img-login-check{background:url('../assets/contents/chkbox.png') no-repeat left center/20px 20px}
+.pp-img-login-check.on{background-image:url('../assets/contents/chkbox_checked.png')}
+.pp-img-login-bg{background:var(--pp-navy-800) url('../assets/contents/login_bg.png') no-repeat center center/100% 100%}
+.pp-img-select-native{-webkit-appearance:auto;appearance:auto}
+.pp-img-header-logo{display:inline-block;width:85px;height:22px;background:url('../assets/logo/header_logo.png') no-repeat center/85px 22px}
+.pp-img-login-logo{display:block;width:100%;aspect-ratio:340/45;background:url('../assets/logo/login_logo.png') no-repeat center/100% 100%}
+.pp-img-footer-logo{display:inline-block;width:87px;height:50px;background:url('../assets/logo/login_footer_logo.png') no-repeat center/87px 50px}
+.pp-img-loading{display:inline-block;width:120px;height:120px;background:url('../assets/contents/loading.gif') no-repeat center/120px 120px}

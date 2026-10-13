@@ -1,0 +1,5 @@
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--font-sans);font-size:var(--text-base-size);line-height:1.5;color:var(--text-body)}
+input,select,textarea,button{font-family:var(--font-sans)}
+a{color:inherit;text-decoration:none}a:hover{text-decoration:none;color:var(--action-primary-hover)}
+h1,h2,h3,h4,h5,h6{margin:0;font-weight:700}p{margin:0}

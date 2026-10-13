@@ -1,0 +1,17 @@
+:root{
+--font-sans:'nanumsquare','malgun gothic',sans-serif,'dotum';
+--fw-light:300; /* @kind font */
+--fw-regular:400; /* @kind font */
+--fw-medium:500; /* @kind font */
+--fw-bold:700; /* @kind font */
+
+/* sizes as used in source (px) */
+--fs-10:10px;--fs-12:12px;--fs-13:13px;--fs-14:14px;--fs-15:15px;--fs-16:16px;--fs-18:18px;--fs-20:20px;--fs-22:22px;--fs-25:25px;--fs-40:40px;--fs-110:110px;
+/* bootstrap headings (rem on 16px root) */
+--fs-h4:24px;--fs-h5:20px;--fs-h6:16px;
+/* semantic */
+--text-base-size:var(--fs-12);--text-base-lh:1.5;
+--text-page-title:var(--fs-h4);--text-section-title:var(--fs-h6);--text-section-title-lg:var(--fs-18);--text-modal-title:var(--fs-h5);
+--text-gnb:var(--fs-14);--text-lnb:var(--fs-14);--text-lnb-tab:var(--fs-15);--text-tab:var(--fs-13);--text-grid:var(--fs-13);--text-field:var(--fs-12);--text-button:var(--fs-12);--text-button-lg:var(--fs-16);
+--text-kpi:var(--fs-22);--text-kpi-lg:var(--fs-20);--text-kpi-label:var(--fs-14);
+}

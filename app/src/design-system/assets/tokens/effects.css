@@ -1,0 +1,11 @@
+:root{
+--radius-2:2px;--radius-4:4px;--radius-5:5px;--radius-card:4px;--radius-filter:4.8px;--radius-login:10px;--radius-modal:14px;--radius-pill:25px;--radius-round:50%;
+--shadow-modal:0 7px 20px 5px rgba(0,0,0,.19);--shadow-login-cta:4px 0 10px rgba(223,0,36,.25);
+--backdrop-modal:rgba(0,0,0,.3);--backdrop-loading:rgba(0,0,0,.6);
+--z-lnb:500; /* @kind other */
+--z-header:600; /* @kind other */
+--z-modal:1050; /* @kind other */
+--z-loading:9000; /* @kind other */
+
+--transition-btn:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; /* @kind other */
+}

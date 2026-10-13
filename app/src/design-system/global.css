@@ -1,0 +1,4 @@
+/* Page-level rules from the screen's <helmet> block. */
+body { margin: 0; font-family: var(--font-sans); }
+a { color: var(--pp-navy-800); }
+a:hover { color: #5c6284; }
