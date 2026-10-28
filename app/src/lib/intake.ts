@@ -1,5 +1,5 @@
 import type { ScreenSchema } from '../schema/types';
-import guide from './schemaGuide.md?raw';
+import { schemaGuide as guide } from './schemaGuide';
 
 /* 인테이크 질문지 → Claude에 붙여넣을 프롬프트. The generator app itself never calls an AI; the PM pastes this
    into Claude (Max), gets a ScreenSchema JSON back and uploads it with [새 화면 올리기]. */
@@ -128,6 +128,18 @@ export function buildPrompt(form: IntakeForm, reference?: { title: string; schem
     lines.push(`## 참고 화면 스키마 — "${reference.title}" (같은 형식·같은 shell로 작성)`, '```json', JSON.stringify(reference.schema, null, 1), '```', '');
   }
   return lines.join('\n');
+}
+
+/** The filled questionnaire as plain request text for the in-app generator (rules and reference are added server-side). */
+export function requestText(form: IntakeForm): string {
+  const out = [`화면명: ${form.title.trim()}`, `메뉴 경로: ${form.menuPath.trim()}`, ''];
+  for (const f of INTAKE_FIELDS) {
+    if (f.key === 'title' || f.key === 'menuPath') continue;
+    if (f.listOnly && form.pattern !== '목록') continue;
+    const v = String(form[f.key]).trim();
+    if (v) out.push(`## ${f.label}`, v, '');
+  }
+  return out.join('\n').trim();
 }
 
 /** The questionnaire as Markdown, for PMs who prefer to fill it in a doc first. */

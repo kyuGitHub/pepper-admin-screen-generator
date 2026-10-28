@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Checkbox, Input, Select, Textarea } from '../design-system';
 import { Brand, Toolbar } from '../generator/chrome';
 import { copyText, downloadText } from '../lib/export';
-import { EMPTY_INTAKE, INTAKE_FIELDS, buildPrompt, type IntakeForm } from '../lib/intake';
+import { EMPTY_INTAKE, INTAKE_FIELDS, buildPrompt, requestText, type IntakeForm } from '../lib/intake';
 import { AREAS, PATTERNS, getScreen, listScreens, type ScreenSummary } from '../lib/screens';
 import { isConfigured } from '../lib/supabase';
 import type { ScreenSchema } from '../schema/types';
@@ -14,6 +14,7 @@ import { SAMPLE_SCREENS } from '../screens';
 const DRAFT_KEY = 'intake-draft';
 
 export function IntakePage({ demo = false }: { demo?: boolean }) {
+  const navigate = useNavigate();
   const [form, setForm] = useState<IntakeForm>(() => {
     try {
       const raw = localStorage.getItem(DRAFT_KEY);
@@ -166,6 +167,18 @@ export function IntakePage({ demo = false }: { demo?: boolean }) {
             <Button variant="primary" onClick={() => copyText(prompt).then(() => flash('프롬프트를 복사했습니다'))}>
               프롬프트 복사
             </Button>
+            {!demo && (
+              <Button
+                variant="danger"
+                onClick={() => {
+                  sessionStorage.setItem('ai-request', requestText(form));
+                  navigate('/generate');
+                }}
+                disabled={missing.length > 0}
+              >
+                AI로 바로 생성
+              </Button>
+            )}
             <Button variant="outline" onClick={() => downloadText(`${form.title.trim() || '화면'} 요청서.md`, prompt, 'text/markdown')}>
               .md 내려받기
             </Button>

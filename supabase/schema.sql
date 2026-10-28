@@ -58,3 +58,31 @@ create policy "thumbnails: public read"          on storage.objects for select u
 create policy "thumbnails: authenticated write"  on storage.objects for insert to authenticated with check (bucket_id = 'thumbnails');
 create policy "thumbnails: authenticated update" on storage.objects for update to authenticated using (bucket_id = 'thumbnails');
 create policy "thumbnails: authenticated delete" on storage.objects for delete to authenticated using (bucket_id = 'thumbnails');
+
+-- 4. AI 생성 기록 (사용자별 일일 한도 계산 + 비용 모니터링) --------------------------
+create table if not exists public.ai_runs (
+  id            uuid primary key default gen_random_uuid(),
+  user_id       uuid references auth.users(id) on delete set null,
+  email         text,
+  mode          text not null,            -- generate / modify
+  model         text not null,
+  input_tokens  integer not null default 0,
+  output_tokens integer not null default 0,
+  cache_read_tokens integer not null default 0,
+  cost_usd      numeric(10,4) not null default 0,
+  seconds       numeric(8,2) not null default 0,
+  attempts      integer not null default 1,
+  status        text not null,            -- ok / error
+  error         text,
+  request       text,                     -- 요청 앞부분 (2000자)
+  created_at    timestamptz not null default now()
+);
+
+create index if not exists ai_runs_user_created_idx on public.ai_runs (user_id, created_at desc);
+
+alter table public.ai_runs enable row level security;
+
+drop policy if exists "ai_runs: own read"   on public.ai_runs;
+drop policy if exists "ai_runs: own insert" on public.ai_runs;
+create policy "ai_runs: own read"   on public.ai_runs for select to authenticated using (user_id = auth.uid());
+create policy "ai_runs: own insert" on public.ai_runs for insert to authenticated with check (user_id = auth.uid());

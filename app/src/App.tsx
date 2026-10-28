@@ -6,6 +6,7 @@ import { ThumbnailCheck } from './pages/ThumbnailCheck';
 import { DemoScreenPage } from './pages/DemoScreenPage';
 import { IntakePage } from './pages/IntakePage';
 import { GuidePage } from './pages/GuidePage';
+import { GeneratePage } from './pages/GeneratePage';
 import { isConfigured } from './lib/supabase';
 import { LoginPage } from './pages/LoginPage';
 import { ScreenListPage } from './pages/ScreenListPage';
@@ -81,6 +82,14 @@ export function App() {
             element={
               <RequireAuth>
                 <ScreenListPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/generate"
+            element={
+              <RequireAuth>
+                <GeneratePage />
               </RequireAuth>
             }
           />

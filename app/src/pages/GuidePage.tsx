@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Brand, Toolbar } from '../generator/chrome';
 import { downloadText } from '../lib/export';
 import { intakeMarkdown } from '../lib/intake';
-import guide from '../lib/schemaGuide.md?raw';
+import { schemaGuide as guide } from '../lib/schemaGuide';
 
 /* 사용 안내: the PM flow in six steps, what each export is for, and the pilot checklist. */
 
