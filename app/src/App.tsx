@@ -7,7 +7,7 @@ import { ScreenListPage } from './pages/ScreenListPage';
 import { ScreenPage } from './pages/ScreenPage';
 import { SetPasswordPage } from './pages/SetPasswordPage';
 import { ScreenRenderer } from './renderer/ScreenRenderer';
-import { loanApplicationDetailScreen } from './screens/loanApplicationDetail/schema';
+import { SAMPLE_SCREENS } from './screens';
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const { session, loading, needsPassword } = useAuth();
@@ -19,13 +19,16 @@ function RequireAuth({ children }: { children: ReactNode }) {
 }
 
 export function App() {
-  // Demo mode (no Supabase variables): the sample screen only, as used by `npm run build:single`.
-  if (!isConfigured)
+  // Demo mode (no Supabase variables): a built-in sample only, picked with ?screen=<key>; used by `npm run build:single`.
+  if (!isConfigured) {
+    const key = new URLSearchParams(window.location.search).get('screen') ?? 'loanApplicationDetail';
+    const sample = SAMPLE_SCREENS[key] ?? SAMPLE_SCREENS.loanApplicationDetail;
     return (
       <div style={{ height: '100vh' }}>
-        <ScreenRenderer schema={loanApplicationDetailScreen} />
+        <ScreenRenderer schema={sample.schema} />
       </div>
     );
+  }
 
   return (
     <BrowserRouter>

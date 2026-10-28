@@ -1,5 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
-import { Button, Checkbox, FieldTable, Input, Panel, Radio, Select, type ButtonSize, type FieldTableCell } from '../design-system';
+import { Button, Checkbox, Datepicker, FieldTable, Icon, Input, Panel, Radio, Select, Textarea, type ButtonSize, type FieldTableCell } from '../design-system';
+import { ActionRowBlock, CollapsibleBlock, EditorBlock, GridBlock, SearchBarBlock, TabsBlock } from './listBlocks';
 import type { ActionSchema, BlockSchema, FieldCellSchema, FieldTableCellSchema, PanelSchema, TableColumnSchema } from '../schema/types';
 import { isField, sectionOf } from './compile';
 import { useScreen } from './runtime';
@@ -35,6 +36,8 @@ export function ActionButton({ action, panel, size }: { action: ActionSchema; pa
           {action.label}
         </Button>
       );
+    case 'detailToggle':
+      return null;
     case 'formSave':
       return (
         <Button variant="primary" size={size} disabled={!panel || !isFormDirty(panel)} onClick={() => panel && actions.saveForm(panel)}>
@@ -202,6 +205,18 @@ function BlockView({ block: b, panel }: { block: BlockSchema; panel?: PanelSchem
         </table>
       );
     }
+    case 'searchBar':
+      return <SearchBarBlock block={b} />;
+    case 'grid':
+      return <GridBlock block={b} />;
+    case 'collapsible':
+      return <CollapsibleBlock block={b} panel={panel} />;
+    case 'tabs':
+      return <TabsBlock block={b} panel={panel} />;
+    case 'editor':
+      return <EditorBlock block={b} />;
+    case 'actionRow':
+      return <ActionRowBlock block={b} panel={panel} />;
     case 'text':
       return <div style={{ ...(b.tone === 'muted' ? muted : { fontSize: 12 }), marginBottom: 8 }}>{b.text}</div>;
     case 'empty':
@@ -212,22 +227,127 @@ function BlockView({ block: b, panel }: { block: BlockSchema; panel?: PanelSchem
 /* ------------------------------------------------------------------ field tables */
 
 function FieldsBlock({ block, panel }: { block: Extract<BlockSchema, { type: 'fields' }>; panel?: PanelSchema }) {
-  const rows: FieldTableCell[][] = block.rows.map((r) => r.map((c) => toCell(c, panel)));
-  return <FieldTable columns={block.columns} labelWidth={block.labelWidth} valueWidth={block.valueWidth} rows={rows} />;
+  const rows: FieldTableCell[][] = block.rows.map((r) => r.map((c) => toCell(c, panel, block.editable)));
+  return <FieldTable columns={block.columns} labelWidth={block.labelWidth} valueWidth={block.valueWidth} labelAlign={block.labelAlign} rows={rows} />;
 }
 
-function toCell(c: FieldTableCellSchema, panel?: PanelSchema): FieldTableCell {
+function toCell(c: FieldTableCellSchema, panel?: PanelSchema, editable?: boolean): FieldTableCell {
   if ('blank' in c) return { raw: '', colSpan: c.blank * 2 };
   if ('note' in c) return { raw: <span style={{ fontSize: 12, color: '#707070', paddingLeft: 5 }}>{c.note}</span>, colSpan: (c.span ?? 1) * 2 };
   if (!isField(c)) return { raw: '' };
-  return { label: c.label, span: c.span, render: <FieldValue field={c} panel={panel} /> };
+  return { label: c.label, span: c.span, render: editable && !c.readOnly ? <EditableField field={c} /> : <FieldValue field={c} panel={panel} /> };
+}
+
+/** Live input for edit modals: local state only (the mock never saves it). */
+function EditableField({ field: f }: { field: FieldCellSchema }) {
+  const { state } = useScreen();
+  const [v, setV] = useState(state.values[f.key] ?? '');
+  const c = f.control;
+  const full: CSSProperties = { display: 'block', width: '100%' };
+  const addon = (icon: ReactNode) => (
+    <Button variant="addon" size="icon" style={{ marginLeft: -1, borderTopLeftRadius: 0, borderBottomLeftRadius: 0, flexShrink: 0 }}>
+      {icon}
+    </Button>
+  );
+  const withAddon = (input: ReactNode, icon: ReactNode) => (
+    <div style={{ display: 'flex', alignItems: 'stretch' }}>
+      <div style={{ flex: 1, minWidth: 0 }}>{input}</div>
+      {addon(icon)}
+    </div>
+  );
+  const text = (extra?: CSSProperties) => (
+    <Input value={v} onChange={(e) => setV(e.target.value)} placeholder={c?.type === 'text' ? c.placeholder : undefined} style={full} inputStyle={extra} />
+  );
+  if (c?.type === 'select') {
+    const ph = c.placeholder ?? '선택하세요';
+    return (
+      <Select options={[ph, ...c.options]} width="100%" style={full} value={v || ph} onChange={(e) => setV(e.target.value === ph ? '' : e.target.value)} />
+    );
+  }
+  if (c?.type === 'textarea') return <Textarea rows={c.rows ?? 3} value={v} onChange={(e) => setV(e.target.value)} style={full} />;
+  if (c?.type === 'date') return <DateField value={v} onChange={setV} />;
+  if (c?.type === 'file') return withAddon(text({ borderTopRightRadius: 0, borderBottomRightRadius: 0 }), <Icon name="search" size={14} />);
+  if (c?.type === 'color')
+    return withAddon(
+      text({ borderTopRightRadius: 0, borderBottomRightRadius: 0 }),
+      <span
+        style={{
+          display: 'inline-block',
+          width: 12,
+          height: 12,
+          borderRadius: 2,
+          background: v ? `#${v.replace('#', '')}` : 'var(--pp-gray-300)',
+          border: '1px solid var(--pp-gray-350)',
+        }}
+      />,
+    );
+  if (f.counter) {
+    const bytes = f.counter.value ?? new TextEncoder().encode(v).length;
+    return (
+      <div style={{ position: 'relative' }}>
+        {text({ paddingRight: 90 })}
+        <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: '#707070', pointerEvents: 'none' }}>
+          {bytes} / {f.counter.max} byte
+        </span>
+      </div>
+    );
+  }
+  if (f.unit)
+    return (
+      <div style={{ position: 'relative' }}>
+        {text({ paddingRight: f.unit.length > 1 ? 34 : 22, textAlign: 'right' })}
+        <span style={{ position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: '#707070', pointerEvents: 'none' }}>
+          {f.unit}
+        </span>
+      </div>
+    );
+  return text();
+}
+
+/** Text input with a calendar addon that opens the design-system Datepicker. */
+function DateField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ position: 'relative' }}>
+      <div style={{ display: 'flex', alignItems: 'stretch' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <Input
+            value={value}
+            placeholder="YYYY-MM-DD"
+            onChange={(e) => onChange(e.target.value)}
+            style={{ display: 'block', width: '100%' }}
+            inputStyle={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+          />
+        </div>
+        <Button
+          variant="addon"
+          size="icon"
+          onClick={() => setOpen((o) => !o)}
+          style={{ marginLeft: -1, borderTopLeftRadius: 0, borderBottomLeftRadius: 0, flexShrink: 0 }}
+        >
+          <Icon name="calendar" size={14} />
+        </Button>
+      </div>
+      {open && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 2px)', left: 0, zIndex: 1000 }}>
+          <Datepicker
+            value={value}
+            onSelect={(s) => {
+              onChange(s);
+              setOpen(false);
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
 }
 
 function FieldValue({ field: f, panel }: { field: FieldCellSchema; panel?: PanelSchema }) {
   const { state, actions, masked } = useScreen();
   const committed = state.values[f.key] ?? '';
 
-  if (f.control?.type === 'select') {
+  if (f.control?.type === 'select' && panel) {
     const placeholder = f.control.placeholder ?? '선택하세요';
     const cur = (panel && state.forms[panel.id]?.[f.key]) ?? committed;
     return (

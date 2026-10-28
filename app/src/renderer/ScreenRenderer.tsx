@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { AppHeader, Button, InputGroup, Lnb, Modal, Panel, Select, Tabs } from '../design-system';
-import type { ColumnItemSchema, ScreenSchema, TabLayoutSchema } from '../schema/types';
+import type { ActionSchema, ColumnItemSchema, ScreenSchema, TabLayoutSchema } from '../schema/types';
 import { isEditablePanel, sectionOf } from './compile';
 import { ActionButton, Blocks, CollapsibleHeader, PanelView } from './PanelView';
 import { ScreenRuntimeProvider, useScreen } from './runtime';
@@ -38,8 +38,18 @@ function Screen() {
         <main style={{ flex: 1, minWidth: 0, overflow: 'auto', padding: state.lnbOpen ? '20px 30px' : '20px 30px 20px 53px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #dee2e6', marginBottom: 20, padding: '0 0 10px 10px' }}>
             <h4 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.2, margin: 0 }}>{schema.title}</h4>
+            {schema.favorite !== undefined && (
+              <span aria-label="즐겨찾기" style={{ fontSize: 20, lineHeight: 1, color: '#303030', marginLeft: 2 }}>
+                {schema.favorite ? '★' : '☆'}
+              </span>
+            )}
           </div>
-          <Toolbar />
+          {(schema.toolbar.search || schema.toolbar.actions.length > 0) && <Toolbar />}
+          {schema.body && schema.body.length > 0 && (
+            <div style={{ marginBottom: 20 }}>
+              <Blocks blocks={schema.body} gap={10} />
+            </div>
+          )}
           {schema.summary.length > 0 && (
             <div style={{ ...twoCols, marginBottom: 20 }}>
               {schema.summary.map((p) => (
@@ -47,16 +57,17 @@ function Screen() {
               ))}
             </div>
           )}
-          <Tabs items={schema.tabs.map((t) => t.label)} value={state.tab} onChange={actions.setTab} />
-          {tab?.layout ? (
-            <TabLayout layout={tab.layout} />
-          ) : (
-            <div style={{ paddingTop: 20 }}>
-              <Panel title={state.tab}>
-                <Blocks blocks={[{ type: 'empty', text: '조회된 데이터가 없습니다.' }]} />
-              </Panel>
-            </div>
-          )}
+          {schema.tabs.length > 0 && <Tabs items={schema.tabs.map((t) => t.label)} value={state.tab} onChange={actions.setTab} />}
+          {schema.tabs.length > 0 &&
+            (tab?.layout ? (
+              <TabLayout layout={tab.layout} />
+            ) : (
+              <div style={{ paddingTop: 20 }}>
+                <Panel title={state.tab}>
+                  <Blocks blocks={[{ type: 'empty', text: '조회된 데이터가 없습니다.' }]} />
+                </Panel>
+              </div>
+            ))}
         </main>
       </div>
       <HistoryModal />
@@ -230,12 +241,39 @@ function ScreenModals() {
       width={m.width}
       onClose={actions.closeModal}
       footer={
-        <Button variant="primary" onClick={actions.closeModal}>
-          {m.closeLabel ?? '닫기'}
-        </Button>
+        m.footer ? (
+          <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 6 }}>
+            {(m.footer.left ?? []).map((a, i) => (
+              <ModalAction key={`l${i}`} action={a} />
+            ))}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+              {(m.footer.right ?? []).map((a, i) => (
+                <ModalAction key={`r${i}`} action={a} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <Button variant="primary" onClick={actions.closeModal}>
+            {m.closeLabel ?? '닫기'}
+          </Button>
+        )
       }
     >
-      <Blocks blocks={m.blocks} gap={0} />
+      <Blocks blocks={m.blocks} gap={m.blockGap ?? 0} />
     </Modal>
   );
+}
+
+const CLOSE_LABELS = new Set(['닫기', '취소']);
+
+/** Footer button of a declared modal: 닫기/취소 close it, everything else is the usual action. */
+function ModalAction({ action }: { action: ActionSchema }) {
+  const { actions } = useScreen();
+  if (action.type === 'button' && CLOSE_LABELS.has(action.label))
+    return (
+      <Button variant={action.variant ?? 'outline'} onClick={actions.closeModal}>
+        {action.label}
+      </Button>
+    );
+  return <ActionButton action={action} />;
 }
