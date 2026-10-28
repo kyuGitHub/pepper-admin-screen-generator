@@ -36,13 +36,30 @@ export function Modal({ open = true, title, children, footer, onClose, width = '
         ...style,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px 0 20px', borderBottom: '1px solid var(--border-divider)' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 10px 0 20px',
+          borderBottom: '1px solid var(--border-divider)',
+        }}
+      >
         <h5 style={{ margin: 0, padding: '5px 0', fontSize: 20, fontWeight: 700, lineHeight: 1.5 }}>{title}</h5>
         <button
           type="button"
           aria-label="닫기"
           onClick={onClose}
-          style={{ minWidth: 40, minHeight: 40, border: 0, background: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{
+            minWidth: 40,
+            minHeight: 40,
+            border: 0,
+            background: 'none',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
           <Icon name="close" size={14} color="#93949a" />
         </button>
@@ -57,7 +74,15 @@ export function Modal({ open = true, title, children, footer, onClose, width = '
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose?.();
       }}
-      style={{ position: 'fixed', inset: 0, zIndex: 1050, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--backdrop-modal)' }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1050,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--backdrop-modal)',
+      }}
     >
       {dialog}
     </div>

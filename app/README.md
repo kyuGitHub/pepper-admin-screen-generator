@@ -6,9 +6,16 @@
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm run build    # 타입체크 + dist/ 빌드
+cp .env.example .env   # Supabase URL·anon 키 입력. 비워 두면 로그인 없는 데모 모드(샘플 화면만)
+npm run dev            # http://localhost:5173
+npm run build          # 타입체크 + dist/ 빌드
 ```
+
+## 제너레이터 (스프린트 0)
+- `/login` — Supabase 이메일/비밀번호 로그인. 계정은 Supabase 대시보드에서 초대 메일로 발급하고, 초대 링크를 열면 `/set-password`에서 비밀번호를 정합니다.
+- `/` — 화면 목록: 썸네일 카드, 제목·영역·패턴·작성자 검색, [새 화면 올리기]
+- `/screens/:id` — 저장된 스키마를 렌더러로 표시, JSON 내려받기, 삭제
+- DB·스토리지 정의는 `../supabase/schema.sql` (Supabase SQL Editor에서 실행)
 
 ## 구조
 
@@ -29,3 +36,11 @@ npm run build    # 타입체크 + dist/ 빌드
 
 ## 단일 HTML로 보기
 `npm run build:single`을 실행하면 `preview/대출신청 상세정보 v3.html`이 다시 만들어집니다. 폰트·이미지까지 한 파일에 들어 있어 더블클릭으로 오프라인에서 열립니다.
+
+## 개발 체크
+```bash
+npm run lint     # ESLint
+npm run format   # Prettier 검사 (수정: npm run format:fix)
+npm test         # Vitest
+```
+PR과 `main` 푸시마다 GitHub Actions(`.github/workflows/ci.yml`)가 위 세 가지와 빌드를 실행합니다. Node 22 (`.nvmrc`).

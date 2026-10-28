@@ -18,7 +18,17 @@ export const fieldBase: CSSProperties = {
   transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out',
 };
 
-export function fieldState({ focus, readOnly, disabled, invalid }: { focus?: boolean; readOnly?: boolean; disabled?: boolean; invalid?: boolean }): CSSProperties {
+export function fieldState({
+  focus,
+  readOnly,
+  disabled,
+  invalid,
+}: {
+  focus?: boolean;
+  readOnly?: boolean;
+  disabled?: boolean;
+  invalid?: boolean;
+}): CSSProperties {
   if (readOnly) return { background: 'var(--pp-gray-60)', borderColor: 'var(--pp-gray-60)' };
   if (disabled) return { background: 'var(--pp-gray-60)', color: 'var(--pp-gray-300)' };
   if (invalid) return { borderColor: 'var(--bs-danger)', boxShadow: focus ? '0 0 0 .2rem rgba(220,53,69,.25)' : 'none' };
@@ -38,7 +48,21 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   inputStyle?: CSSProperties;
 }
 
-export function Input({ value, defaultValue, placeholder, readOnly, disabled, invalid, clearable, align, onChange, width, style, inputStyle, ...rest }: InputProps) {
+export function Input({
+  value,
+  defaultValue,
+  placeholder,
+  readOnly,
+  disabled,
+  invalid,
+  clearable,
+  align,
+  onChange,
+  width,
+  style,
+  inputStyle,
+  ...rest
+}: InputProps) {
   const [focus, setFocus] = useState(false);
   const [inner, setInner] = useState(defaultValue ?? '');
   const controlled = value !== undefined;
@@ -68,8 +92,7 @@ export function Input({ value, defaultValue, placeholder, readOnly, disabled, in
       {...rest}
     />
   );
-  if (!clearable)
-    return <span style={{ display: 'inline-block', width: width ?? style?.width ?? 'auto', verticalAlign: 'middle', ...style }}>{input}</span>;
+  if (!clearable) return <span style={{ display: 'inline-block', width: width ?? style?.width ?? 'auto', verticalAlign: 'middle', ...style }}>{input}</span>;
   return (
     <span style={{ position: 'relative', display: 'inline-block', width: width ?? 'auto', verticalAlign: 'middle', ...style }}>
       {input}

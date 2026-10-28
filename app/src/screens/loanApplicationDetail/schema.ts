@@ -25,7 +25,10 @@ const btn = (label: string): ActionSchema => ({ type: 'button', label });
 const panel = (id: string, title: string, blocks: BlockSchema[], o: Partial<PanelSchema> = {}): PanelSchema => ({ kind: 'panel', id, title, blocks, ...o });
 const col = (key: string, label: string, o: Omit<TableColumnSchema, 'key' | 'label'> = {}): TableColumnSchema => ({ key, label, ...o });
 
-const editWithHistory = (editLabel: string): ActionSchema[] => [{ type: 'edit', label: editLabel }, { type: 'history', label: '변경이력조회' }];
+const editWithHistory = (editLabel: string): ActionSchema[] => [
+  { type: 'edit', label: editLabel },
+  { type: 'history', label: '변경이력조회' },
+];
 const ID_BUTTONS = [btn('신분증 이미지'), btn('본인확인이력'), btn('안면인식이미지')];
 const CONSENT_NOTE = '(SMS / 알림톡 / 이메일 / PUSH)';
 
@@ -110,7 +113,12 @@ const detailLeft: PanelSchema[] = [
       columns: 2,
       labelWidth: '22%',
       valueWidth: '28%',
-      rows: [[f('인지세 면제 대상 여부', 'stampTax', { button: { label: '체크리스트' } }), f('국민주택채권 매입 면제 대상 여부', 'bond', { button: { label: '체크리스트' } })]],
+      rows: [
+        [
+          f('인지세 면제 대상 여부', 'stampTax', { button: { label: '체크리스트' } }),
+          f('국민주택채권 매입 면제 대상 여부', 'bond', { button: { label: '체크리스트' } }),
+        ],
+      ],
     },
   ]),
   panel('contract', '전자약정', [fields([[f('약정완료일시', 'signAt'), f('약정서명수단', 'signBy'), f('CMS서명수단', 'cmsBy')]])], {
@@ -122,7 +130,13 @@ const detailLeft: PanelSchema[] = [
     [1, 2, 3].flatMap((n, i): BlockSchema[] => [
       ...(i ? [{ type: 'divider' } as const] : []),
       { type: 'select', options: [['신분증진위확인', '신분증OCR'], ['타행계좌인증', '휴대폰본인확인'], ['안면인식']][i] },
-      fields([[f('인증요청일시', `idAt${n}`), f('성공여부', `idOk${n}`), f('누적오류횟수', `idErr${n}`, { align: 'right', button: { label: '초기화', variant: 'danger' } })]]),
+      fields([
+        [
+          f('인증요청일시', `idAt${n}`),
+          f('성공여부', `idOk${n}`),
+          f('누적오류횟수', `idErr${n}`, { align: 'right', button: { label: '초기화', variant: 'danger' } }),
+        ],
+      ]),
     ]),
     { actions: ID_BUTTONS },
   ),
@@ -262,7 +276,13 @@ const providerPanels: PanelSchema[] = [
     ['신분증진위확인', '타행계좌인증', '안면인식인증'].flatMap((t, i): BlockSchema[] => [
       ...(i ? [{ type: 'divider', tight: true } as const] : []),
       { type: 'select', options: [t] },
-      fields([[f('인증요청일시', `pIdAt${i + 1}`), f('성공여부', `pIdOk${i + 1}`), f('누적오류횟수', `pIdErr${i + 1}`, { align: 'right', button: { label: '초기화', variant: 'danger' } })]]),
+      fields([
+        [
+          f('인증요청일시', `pIdAt${i + 1}`),
+          f('성공여부', `pIdOk${i + 1}`),
+          f('누적오류횟수', `pIdErr${i + 1}`, { align: 'right', button: { label: '초기화', variant: 'danger' } }),
+        ],
+      ]),
     ]),
     { actions: ID_BUTTONS },
   ),
@@ -290,7 +310,12 @@ const collateralRight: PanelSchema[] = [
     {
       type: 'table',
       table: 'owners',
-      columns: [col('no', 'No.', { align: 'center', width: 50 }), col('name', '소유자'), col('type', '소유형태'), col('share', '소유지분율(%)', { align: 'right' })],
+      columns: [
+        col('no', 'No.', { align: 'center', width: 50 }),
+        col('name', '소유자'),
+        col('type', '소유형태'),
+        col('share', '소유지분율(%)', { align: 'right' }),
+      ],
     },
   ]),
   panel(
@@ -388,7 +413,15 @@ const executionLeft: PanelSchema[] = [
     {
       type: 'controls',
       items: [
-        { type: 'radio', name: 'tiAction', defaultValue: 'offline', options: [{ label: '신청취소', value: 'cancel' }, { label: '오프라인이관', value: 'offline' }] },
+        {
+          type: 'radio',
+          name: 'tiAction',
+          defaultValue: 'offline',
+          options: [
+            { label: '신청취소', value: 'cancel' },
+            { label: '오프라인이관', value: 'offline' },
+          ],
+        },
         { type: 'select', options: ['선택하세요', '고객요청', '심사부결', '서류미비', '기타'] },
         { type: 'button', label: '확인', variant: 'danger' },
       ],
@@ -488,7 +521,14 @@ const lnbTree: LnbNodeSchema[] = [
           {
             label: '대출신청',
             open: true,
-            children: [L('대출신청 목록', 'list'), L('대출신청 상세정보', 'detail'), L('대출신청 서류접수 목록'), L('정밀심사 대상 목록'), L('대출실행 대상 목록'), L('대출실행 목록')],
+            children: [
+              L('대출신청 목록', 'list'),
+              L('대출신청 상세정보', 'detail'),
+              L('대출신청 서류접수 목록'),
+              L('정밀심사 대상 목록'),
+              L('대출실행 대상 목록'),
+              L('대출실행 목록'),
+            ],
           },
           L('모기지 이관 목록'),
         ],

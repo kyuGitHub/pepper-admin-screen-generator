@@ -1,0 +1,7 @@
+dist
+node_modules
+src/design-system/assets
+package-lock.json
+README.md
+*.md
+*.css
