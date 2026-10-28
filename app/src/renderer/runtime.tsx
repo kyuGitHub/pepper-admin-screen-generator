@@ -74,7 +74,14 @@ function useRuntime(compiled: CompiledScreen) {
       patch((st) => {
         const at = nowStamp();
         const section = sectionOf(p);
-        const entry = (item: string, before: string, after: string): HistoryEntry => ({ at, section, item, before: before || '-', after: after || '-', by: schema.currentUser });
+        const entry = (item: string, before: string, after: string): HistoryEntry => ({
+          at,
+          section,
+          item,
+          before: before || '-',
+          after: after || '-',
+          by: schema.currentUser,
+        });
         const changed = panelFields(p).filter((f) => !f.control && st.draft[f.key] !== undefined && st.draft[f.key] !== (st.values[f.key] ?? ''));
         const entries = changed.map((f) => entry(f.label, st.values[f.key] ?? '', st.draft[f.key]));
         const tables = { ...st.tables };
@@ -107,7 +114,14 @@ function useRuntime(compiled: CompiledScreen) {
         const form = st.forms[p.id] ?? {};
         const changed = panelFields(p).filter((f) => f.control && form[f.key] !== undefined && form[f.key] !== (st.values[f.key] ?? ''));
         if (!changed.length) return {};
-        const entries = changed.map((f) => ({ at, section: sectionOf(p), item: f.label, before: st.values[f.key] || '-', after: form[f.key] || '-', by: schema.currentUser }));
+        const entries = changed.map((f) => ({
+          at,
+          section: sectionOf(p),
+          item: f.label,
+          before: st.values[f.key] || '-',
+          after: form[f.key] || '-',
+          by: schema.currentUser,
+        }));
         return {
           values: { ...st.values, ...Object.fromEntries(changed.map((f) => [f.key, form[f.key]])) },
           forms: { ...st.forms, [p.id]: {} },

@@ -29,3 +29,11 @@ npm run build    # 타입체크 + dist/ 빌드
 
 ## 단일 HTML로 보기
 `npm run build:single`을 실행하면 `preview/대출신청 상세정보 v3.html`이 다시 만들어집니다. 폰트·이미지까지 한 파일에 들어 있어 더블클릭으로 오프라인에서 열립니다.
+
+## 개발 체크
+```bash
+npm run lint     # ESLint
+npm run format   # Prettier 검사 (수정: npm run format:fix)
+npm test         # Vitest
+```
+PR과 `main` 푸시마다 GitHub Actions(`.github/workflows/ci.yml`)가 위 세 가지와 빌드를 실행합니다. Node 22 (`.nvmrc`).

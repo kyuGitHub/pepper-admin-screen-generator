@@ -22,7 +22,15 @@ function Screen() {
   return (
     <div
       data-screen-label={schema.title}
-      style={{ minWidth: 1860, height: '100vh', display: 'flex', flexDirection: 'column', background: '#fff', fontFamily: 'var(--font-sans)', color: '#303030' }}
+      style={{
+        minWidth: 1860,
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        background: '#fff',
+        fontFamily: 'var(--font-sans)',
+        color: '#303030',
+      }}
     >
       <AppHeader {...header} lastLogin={header.lastLogin ?? ''} />
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>

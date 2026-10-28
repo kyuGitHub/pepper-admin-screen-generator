@@ -46,7 +46,15 @@ export function Panel({ title, titleSize = 'md', meta, actions, children, paddin
  * `span` label/value pairs) or a raw cell (`raw` + `colSpan`) used for blanks and notes.
  */
 export type FieldTableCell =
-  | { label?: ReactNode; value?: string; render?: ReactNode; span?: number; align?: 'left' | 'right'; labelAlign?: CSSProperties['verticalAlign']; editable?: boolean }
+  | {
+      label?: ReactNode;
+      value?: string;
+      render?: ReactNode;
+      span?: number;
+      align?: 'left' | 'right';
+      labelAlign?: CSSProperties['verticalAlign'];
+      editable?: boolean;
+    }
   | { raw: ReactNode; colSpan?: number; rowSpan?: number };
 
 export interface FieldTableProps {
@@ -83,7 +91,15 @@ export function FieldTable({ rows = [], columns = 4, labelWidth, valueWidth, var
               return [
                 <th
                   key={`h${ci}`}
-                  style={{ padding: cellPad, border: bd, textAlign: 'left', fontWeight: 700, color: 'var(--pp-gray-800)', lineHeight: 1.2, verticalAlign: c.labelAlign || 'middle' }}
+                  style={{
+                    padding: cellPad,
+                    border: bd,
+                    textAlign: 'left',
+                    fontWeight: 700,
+                    color: 'var(--pp-gray-800)',
+                    lineHeight: 1.2,
+                    verticalAlign: c.labelAlign || 'middle',
+                  }}
                 >
                   {c.label}
                 </th>,

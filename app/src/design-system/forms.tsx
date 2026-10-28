@@ -17,17 +17,8 @@ export interface InputGroupProps {
 export function InputGroup({ icon = 'calendar', onAddonClick, addon, width = 120, inputProps = {}, style }: InputGroupProps) {
   return (
     <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'stretch', verticalAlign: 'middle', ...style }}>
-      <Input
-        width={width}
-        {...inputProps}
-        inputStyle={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, ...(inputProps.inputStyle || {}) }}
-      />
-      <Button
-        variant="addon"
-        size="icon"
-        onClick={onAddonClick}
-        style={{ marginLeft: -1, borderTopLeftRadius: 0, borderBottomLeftRadius: 0, minWidth: 24 }}
-      >
+      <Input width={width} {...inputProps} inputStyle={{ borderTopRightRadius: 0, borderBottomRightRadius: 0, ...(inputProps.inputStyle || {}) }} />
+      <Button variant="addon" size="icon" onClick={onAddonClick} style={{ marginLeft: -1, borderTopLeftRadius: 0, borderBottomLeftRadius: 0, minWidth: 24 }}>
         {addon || <Icon name={icon} size={16} />}
       </Button>
     </span>

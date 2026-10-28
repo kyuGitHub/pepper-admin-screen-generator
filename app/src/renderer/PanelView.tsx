@@ -255,7 +255,9 @@ function FieldValue({ field: f, panel }: { field: FieldCellSchema; panel?: Panel
           onChange={editing ? (e) => actions.setDraft(f.key, e.target.value) : () => {}}
         />
         {f.unit && (
-          <span style={{ position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: '#707070', pointerEvents: 'none' }}>{f.unit}</span>
+          <span style={{ position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: '#707070', pointerEvents: 'none' }}>
+            {f.unit}
+          </span>
         )}
       </div>
       {f.mask && !editing && (
@@ -320,7 +322,12 @@ function TableBlock({ block: b, panel }: { block: Extract<BlockSchema, { type: '
       return (
         <td key={c.key} style={{ padding: `4px ${padX}`, textAlign: c.align }}>
           {editing ? (
-            <Input value={v} align={c.align === 'right' ? 'right' : 'left'} style={{ width: '100%' }} onChange={(e) => actions.setTableCell(b.table, i, c.key, e.target.value)} />
+            <Input
+              value={v}
+              align={c.align === 'right' ? 'right' : 'left'}
+              style={{ width: '100%' }}
+              onChange={(e) => actions.setTableCell(b.table, i, c.key, e.target.value)}
+            />
           ) : (
             v
           )}
@@ -394,7 +401,11 @@ export function CollapsibleHeader({ no, title, summary, open, onToggle }: { no: 
       <span style={{ fontSize: 15, fontWeight: 700, color: '#303030' }}>{title}</span>
       <span style={{ fontSize: 12, color: '#707070' }}>{summary}</span>
       <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: '#505050' }}>{open ? '접기' : '펼치기'}</span>
-      <span style={{ display: 'inline-block', fontSize: 10, color: '#505050', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .15s' }}>▼</span>
+      <span
+        style={{ display: 'inline-block', fontSize: 10, color: '#505050', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform .15s' }}
+      >
+        ▼
+      </span>
     </div>
   );
 }

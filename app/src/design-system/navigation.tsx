@@ -100,11 +100,30 @@ export function AppHeader({
                     e.preventDefault();
                     onNavigate?.(m);
                   }}
-                  style={{ position: 'relative', display: 'block', padding: 15, fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.5, textDecoration: 'none' }}
+                  style={{
+                    position: 'relative',
+                    display: 'block',
+                    padding: 15,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: '#fff',
+                    lineHeight: 1.5,
+                    textDecoration: 'none',
+                  }}
                 >
                   {m}
                   {on && (
-                    <span style={{ position: 'absolute', bottom: 14, left: '50%', transform: 'translateX(-50%)', width: 'calc(100% - 30px)', height: 2, background: '#fff' }} />
+                    <span
+                      style={{
+                        position: 'absolute',
+                        bottom: 14,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: 'calc(100% - 30px)',
+                        height: 2,
+                        background: '#fff',
+                      }}
+                    />
                   )}
                 </a>
               </li>
@@ -320,7 +339,17 @@ export interface LnbProps {
   style?: CSSProperties;
 }
 
-export function Lnb({ tree = [], tabs = ['입력결과', '즐겨찾기'], activeId, onSelect, open: openProp, defaultOpen = true, onToggleOpen, height = '100%', style }: LnbProps) {
+export function Lnb({
+  tree = [],
+  tabs = ['입력결과', '즐겨찾기'],
+  activeId,
+  onSelect,
+  open: openProp,
+  defaultOpen = true,
+  onToggleOpen,
+  height = '100%',
+  style,
+}: LnbProps) {
   const [openInner, setOpenInner] = useState(defaultOpen);
   const isOpen = openProp !== undefined ? openProp : openInner;
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
@@ -380,7 +409,17 @@ export function Lnb({ tree = [], tabs = ['입력결과', '즐겨찾기'], active
             </div>
             <ul style={{ margin: 0, padding: '20px 0 0' }}>
               {tree.map((n, i) => (
-                <Node key={i} node={n} depth={1} isLast={i === tree.length - 1} path={String(i)} openMap={openMap} toggle={toggle} activeId={activeId} onSelect={onSelect} />
+                <Node
+                  key={i}
+                  node={n}
+                  depth={1}
+                  isLast={i === tree.length - 1}
+                  path={String(i)}
+                  openMap={openMap}
+                  toggle={toggle}
+                  activeId={activeId}
+                  onSelect={onSelect}
+                />
               ))}
             </ul>
           </div>

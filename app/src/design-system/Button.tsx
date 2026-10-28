@@ -44,8 +44,7 @@ function look(variant: ButtonVariant, size: ButtonSize, hover: boolean, disabled
               background: '#fff',
               color: hover ? 'var(--pp-navy-500)' : 'var(--pp-navy-800)',
             };
-      if (disabled)
-        return { border: '1px solid var(--pp-navy-200)', background: '#eee', color: 'var(--pp-navy-200)', fontWeight: 500 };
+      if (disabled) return { border: '1px solid var(--pp-navy-200)', background: '#eee', color: 'var(--pp-navy-200)', fontWeight: 500 };
       return {
         border: `1px solid ${hover ? 'var(--pp-navy-800)' : 'var(--pp-gray-350)'}`,
         background: '#fff',
@@ -104,14 +103,7 @@ export function Button({ variant = 'primary', size = 'md', disabled = false, chi
     ...style,
   };
   return (
-    <button
-      type={type}
-      disabled={disabled}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={merged}
-      {...rest}
-    >
+    <button type={type} disabled={disabled} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} style={merged} {...rest}>
       {children}
     </button>
   );
