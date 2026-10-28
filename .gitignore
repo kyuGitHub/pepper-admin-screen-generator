@@ -1,2 +1,3 @@
 project/uploads/
 app/public/viewer-template.html
+app/api/generate.js

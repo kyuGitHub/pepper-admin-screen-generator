@@ -2,7 +2,7 @@ import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { IncomingMessage } from 'node:http';
 
-/** Dev-only: serves api/*.ts through the same Web-standard handlers Vercel runs, so `npm run dev` has /api/generate. */
+/** Dev-only: serves src/server/*.ts through the same Web-standard handlers Vercel runs (bundled to api/*.js), so `npm run dev` has /api/generate. */
 function vercelApi(): Plugin {
   return {
     name: 'vercel-api-dev',
@@ -15,7 +15,7 @@ function vercelApi(): Plugin {
           .split('?')[0]
           .replace(/[^a-zA-Z0-9_-]/g, '');
         try {
-          const mod = (await server.ssrLoadModule(`/api/${name}.ts`)) as Record<string, (r: Request) => Promise<Response>>;
+          const mod = (await server.ssrLoadModule(`/src/server/${name}.ts`)) as Record<string, (r: Request) => Promise<Response>>;
           const handler = mod[req.method ?? 'GET'] ?? mod.default;
           if (!handler) {
             res.statusCode = 405;

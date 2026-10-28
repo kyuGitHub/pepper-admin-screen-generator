@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
-import { validateScreenSchema } from '../src/lib/validateSchema';
+import { validateScreenSchema } from '../lib/validateSchema';
 import {
   MODELS,
   SYSTEM_PROMPT,
@@ -15,10 +15,10 @@ import {
   type AiEvent,
   type AiRequest,
   type AiUsage,
-} from '../src/server/ai';
-import type { ScreenSchema } from '../src/schema/types';
+} from './ai';
+import type { ScreenSchema } from '../schema/types';
 
-/* Vercel Function: POST /api/generate — calls Claude for a logged-in PM and streams NDJSON events back.
+/* Vercel Function source (bundled to api/generate.js by scripts/build-api.mjs): POST /api/generate — calls Claude for a logged-in PM and streams NDJSON events back.
    The API key lives only here (ANTHROPIC_API_KEY). Each run is written to `ai_runs` (supabase/schema.sql). */
 
 export const config = { maxDuration: 300 };

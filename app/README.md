@@ -28,6 +28,7 @@ npm run build          # 타입체크 + dist/ 빌드
 | 보안 | API 키는 Vercel 환경변수 `ANTHROPIC_API_KEY`에만(브라우저로 나가지 않음). Supabase 로그인 토큰이 있어야 호출됨 |
 | 한도·기록 | 사용자별 24시간 `AI_DAILY_LIMIT`회(기본 30). 호출마다 `ai_runs` 테이블에 토큰·비용·소요시간 기록 (`../supabase/schema.sql` 4절) |
 | 실행 시간 | 보통 1~3분, 진행 상황 스트리밍. `vercel.json`의 `maxDuration: 300` |
+| 빌드 | 함수 소스는 `src/server/generate.ts`. `npm run build`가 esbuild로 `api/generate.js` 한 파일로 번들(git 제외)하므로 Vercel은 그 파일만 배포 |
 
 설정 순서:
 1. [Anthropic Console](https://console.anthropic.com) → API Keys → 키 발급 (Billing에서 선불 충전과 월 한도 설정 권장).
@@ -106,7 +107,7 @@ Generator 디자인시스템은 Claude Design의 "화면 제너레이터 — UI 
 | `src/editor/` | 클릭 편집기 (요소 선택, 속성 패널, 추가·삭제·순서, 실행취소, 저장) |
 | `src/lib/spec.ts`, `src/lib/export.ts` | 화면정의서 생성(Markdown·HTML), 단일 HTML·PNG·JSON 내보내기 |
 | `src/lib/intake.ts`, `src/lib/schemaGuide.ts`, `src/lib/sampleData.ts` | 요청서 → Claude 프롬프트, 스키마 작성 규칙, 샘플 데이터 생성 |
-| `api/generate.ts`, `src/server/ai.ts`, `src/lib/ai.ts` | AI 생성 서버 함수(인증·한도·스트리밍), 프롬프트·변경 명령 적용, 브라우저 호출 |
+| `src/server/generate.ts` → `api/generate.js`(빌드 생성), `src/server/ai.ts`, `src/lib/ai.ts` | AI 생성 서버 함수(인증·한도·스트리밍, esbuild로 단일 파일 번들), 프롬프트·변경 명령 적용, 브라우저 호출 |
 | `scripts/` | 단일 파일 빌드 (`build-single.mjs` 데모 전체, `build-viewer.mjs` 내보내기용 뷰어 템플릿) |
 | `src/screens/loanApplicationDetail/` | v3 화면 스키마(`schema.ts`)와 샘플 데이터(`data.ts`) |
 
