@@ -54,7 +54,11 @@ export function validateScreenSchema(text: string): ValidationResult {
   need('shell', (v) => isObj(v) && isObj(v.header) && isObj(v.lnb), 'header·lnb를 가진 객체');
   need('toolbar', (v) => isObj(v) && Array.isArray(v.actions), 'actions 배열을 가진 객체');
   need('summary', Array.isArray, '패널 배열');
-  need('tabs', (v) => Array.isArray(v) && v.length > 0 && v.every((t) => isObj(t) && typeof t.label === 'string'), 'label을 가진 탭 배열');
+  // 상세 화면은 탭으로, 목록 화면은 body 블록으로 구성되므로 둘 중 하나는 있어야 한다.
+  need('tabs', (v) => Array.isArray(v) && v.every((t) => isObj(t) && typeof t.label === 'string'), 'label을 가진 탭 배열 (목록 화면은 빈 배열)');
+  if (Array.isArray(raw.tabs) && raw.tabs.length === 0 && !(Array.isArray(raw.body) && raw.body.length > 0))
+    errors.push('"tabs" 가 비어 있으면 "body" 블록 배열이 하나 이상 있어야 합니다 (목록 화면: searchBar + grid).');
+  if ('body' in raw && !Array.isArray(raw.body)) errors.push('"body" 항목의 형식이 다릅니다 (블록 배열).');
   need('data', (v) => isObj(v) && isObj(v.values) && isObj(v.tables), 'values·tables를 가진 객체');
   need('currentUser', (v) => typeof v === 'string', '변경자 표시용 문자열');
 

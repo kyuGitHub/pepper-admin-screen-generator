@@ -14,7 +14,7 @@ npm run build          # 타입체크 + dist/ 빌드
 ## 제너레이터 (스프린트 0)
 - `/login` — Supabase 이메일/비밀번호 로그인. 계정은 Supabase 대시보드에서 초대 메일로 발급하고, 초대 링크를 열면 `/set-password`에서 비밀번호를 정합니다.
 - `/` — 화면 목록: 썸네일 카드, 제목·영역·패턴·작성자 검색, [새 화면 올리기]
-- `/screens/:id` — 저장된 스키마를 렌더러로 표시, [편집], JSON 내려받기, 삭제
+- `/screens/:id` — 저장된 스키마를 렌더러로 표시, [편집], 썸네일 갱신, JSON 내려받기, 삭제
 - DB·스토리지 정의는 `../supabase/schema.sql` (Supabase SQL Editor에서 실행)
 
 ## 클릭 편집기
@@ -33,7 +33,7 @@ npm run build          # 타입체크 + dist/ 빌드
 
 - 툴바: [실행취소](Ctrl+Z, 최근 50단계) · [취소](편집 종료) · [저장](Supabase에 스키마 저장 + 썸네일 다시 생성)
 - Esc 키 또는 빈 곳 클릭으로 선택을 해제합니다. 편집 중에도 탭 전환·팝업 열기 등 목업 동작은 그대로 됩니다.
-- 데모 모드(Supabase 미설정)에서는 `?screen=<key>&edit=1`로 열리고, [저장] 대신 [JSON 내려받기]가 됩니다.
+- 데모 모드(Supabase 미설정)에서는 `?screen=<key>&edit=1`로 열리고, [저장] 대신 [JSON 내려받기]가 됩니다. `?screen=<key>&thumb=1`은 썸네일 캡처 결과를 보여 줍니다(디버깅용).
 - 구현: `src/editor/` (`EditorContext` 선택·초안·되돌리기, `PropertyPanel` 속성 폼, `EditorFrame` 편집 화면 틀, `paths` 스키마 경로 수정 도우미). 렌더러는 편집 컨텍스트가 있을 때만 요소를 `Selectable`로 감쌉니다.
 
 ## 구조

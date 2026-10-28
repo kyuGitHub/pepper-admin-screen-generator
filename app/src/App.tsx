@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
 import { EditorFrame } from './editor/EditorFrame';
+import { ThumbnailCheck } from './pages/ThumbnailCheck';
 import { isConfigured } from './lib/supabase';
 import { LoginPage } from './pages/LoginPage';
 import { ScreenListPage } from './pages/ScreenListPage';
@@ -25,6 +26,8 @@ export function App() {
     const params = new URLSearchParams(window.location.search);
     const key = params.get('screen') ?? 'loanApplicationDetail';
     const sample = SAMPLE_SCREENS[key] ?? SAMPLE_SCREENS.loanApplicationDetail;
+    // ?thumb=1 shows what the thumbnail capture produces for the sample (debugging aid, no database needed).
+    if (params.get('thumb')) return <ThumbnailCheck schema={sample.schema} />;
     // ?edit=1 opens the click editor on the sample; 저장 downloads the edited JSON (there is no database in demo mode).
     if (params.get('edit')) {
       return (

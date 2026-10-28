@@ -50,6 +50,24 @@ export function ScreenPage() {
     setEditing(false);
   };
 
+  const [thumbBusy, setThumbBusy] = useState(false);
+  const refreshThumbnail = async () => {
+    if (!row) return;
+    setThumbBusy(true);
+    try {
+      const blob = await captureThumbnail(row.schema);
+      if (!blob) throw new Error('캡처 결과가 비어 있습니다.');
+      const thumbnail_path = await uploadThumbnail(row.id, blob);
+      await updateScreen(row.id, { thumbnail_path });
+      setRow({ ...row, thumbnail_path, updated_at: new Date().toISOString() });
+      window.alert('썸네일을 다시 만들었습니다. 목록에서 확인하세요.');
+    } catch (e) {
+      window.alert(`썸네일 생성 실패: ${(e as Error).message ?? e}`);
+    } finally {
+      setThumbBusy(false);
+    }
+  };
+
   const heading = (
     <>
       <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 13 }}>
@@ -83,6 +101,15 @@ export function ScreenPage() {
             style={{ background: '#fff', color: 'var(--pp-navy-800)', borderColor: '#fff' }}
           >
             편집
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshThumbnail}
+            disabled={!row || thumbBusy}
+            style={{ background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' }}
+          >
+            {thumbBusy ? '썸네일 생성 중…' : '썸네일 갱신'}
           </Button>
           <Button
             variant="outline"
