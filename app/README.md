@@ -33,7 +33,8 @@ npm run build          # 타입체크 + dist/ 빌드
 1. [Anthropic Console](https://console.anthropic.com) → API Keys → 키 발급 (Billing에서 선불 충전과 월 한도 설정 권장).
 2. Vercel → 프로젝트 → Settings → Environment Variables → `ANTHROPIC_API_KEY` 등록(값은 키 그대로, 접두사 없음) → Redeploy.
 3. Supabase SQL Editor에서 `../supabase/schema.sql`의 4절(ai_runs)을 실행. 실행 전에도 생성은 되지만 한도와 기록이 동작하지 않습니다.
-4. 로컬: `.env`에 `ANTHROPIC_API_KEY`를 넣으면 `npm run dev`에서 `/api/generate`가 같은 코드로 동작합니다(`vite.config.ts`의 dev 플러그인). 키 없이 UI만 볼 때는 `AI_MOCK=1`.
+4. 점검: 브라우저에서 `/api/generate`를 열면(GET) 키·Supabase·모델 설정 상태가 JSON으로 보입니다. 키는 앞 10자만 표시됩니다.
+5. 로컬: `.env`에 `ANTHROPIC_API_KEY`를 넣으면 `npm run dev`에서 `/api/generate`가 같은 코드로 동작합니다(`vite.config.ts`의 dev 플러그인). 키 없이 UI만 볼 때는 `AI_MOCK=1`.
 
 ## 요청서 → Claude → 화면 (인테이크)
 AI 생성은 Claude(Max 계정)에서, 앱은 요청서와 프롬프트만 만듭니다(API 비용 없음).

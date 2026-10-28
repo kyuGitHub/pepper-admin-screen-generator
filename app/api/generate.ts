@@ -27,6 +27,20 @@ const DAILY_LIMIT = Number(process.env.AI_DAILY_LIMIT ?? 30);
 
 const env = (k: string) => process.env[k] ?? process.env[`VITE_${k}`];
 
+/** GET /api/generate — configuration check without calling Claude: whether the key, Supabase and the model are set. */
+export async function GET(): Promise<Response> {
+  const key = process.env.ANTHROPIC_API_KEY ?? '';
+  return json({
+    ok: key.length > 0,
+    anthropicKey: key ? `설정됨 (${key.slice(0, 10)}…, ${key.length}자)` : '없음 — Vercel 환경변수 ANTHROPIC_API_KEY를 등록하고 Redeploy 하세요',
+    supabase: env('SUPABASE_URL') && env('SUPABASE_ANON_KEY') ? '설정됨' : '없음',
+    models: MODELS,
+    dailyLimit: DAILY_LIMIT,
+    mock: process.env.AI_MOCK === '1',
+    runtime: `node ${process.version}`,
+  });
+}
+
 export async function POST(req: Request): Promise<Response> {
   if (process.env.AI_MOCK === '1') return mock(req);
   const apiKey = process.env.ANTHROPIC_API_KEY;
