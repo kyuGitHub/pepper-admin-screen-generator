@@ -74,3 +74,9 @@ export function thumbnailUrl(path: string | null, updatedAt: string): string | n
   // Cache-bust per update so a re-captured thumbnail shows immediately.
   return `${data.publicUrl}?v=${encodeURIComponent(updatedAt)}`;
 }
+
+/** Copies a screen as a new row ("<title> (복제)") that points at the original through `source_id`. */
+export async function duplicateScreen(row: ScreenRow): Promise<ScreenRow> {
+  const title = `${row.title} (복제)`;
+  return createScreen({ title, area: row.area, pattern: row.pattern, schema: { ...row.schema, title }, source_id: row.id });
+}

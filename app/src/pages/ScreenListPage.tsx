@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { Button, Input } from '../design-system';
 import { Brand, Toolbar } from '../generator/chrome';
-import { deleteScreen, listScreens, thumbnailUrl, type ScreenSummary } from '../lib/screens';
+import { deleteScreen, duplicateScreen, getScreen, listScreens, thumbnailUrl, updateScreen, uploadThumbnail, type ScreenSummary } from '../lib/screens';
+import { captureThumbnail } from '../lib/thumbnail';
 import { UploadDialog } from './UploadDialog';
 
 const fmt = (iso: string) => iso.replace('T', ' ').slice(0, 16);
@@ -30,6 +31,13 @@ export function ScreenListPage() {
     if (!k) return rows;
     return rows.filter((r) => [r.title, r.area, r.pattern, r.created_by_email ?? ''].some((v) => v.toLowerCase().includes(k)));
   }, [rows, q]);
+
+  const duplicate = async (r: ScreenSummary) => {
+    const copy = await duplicateScreen(await getScreen(r.id));
+    const blob = await captureThumbnail(copy.schema);
+    if (blob) await updateScreen(copy.id, { thumbnail_path: await uploadThumbnail(copy.id, blob) });
+    load();
+  };
 
   const remove = async (r: ScreenSummary) => {
     if (!window.confirm(`"${r.title}" 화면을 삭제할까요? 되돌릴 수 없습니다.`)) return;
@@ -154,6 +162,9 @@ export function ScreenListPage() {
                   <div style={{ display: 'flex', gap: 4 }}>
                     <Button variant="outline" size="sm" onClick={() => navigate(`/screens/${r.id}`)}>
                       열기
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => duplicate(r)}>
+                      복제
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => remove(r)} style={{ marginLeft: 'auto', color: 'var(--bs-danger)' }}>
                       삭제

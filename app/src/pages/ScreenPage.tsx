@@ -3,10 +3,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../design-system';
 import { Brand, Toolbar } from '../generator/chrome';
 import { EditorFrame } from '../editor/EditorFrame';
-import { deleteScreen, getScreen, updateScreen, uploadThumbnail, type ScreenRow } from '../lib/screens';
+import { ExportMenu } from '../generator/ExportMenu';
+import { deleteScreen, duplicateScreen, getScreen, updateScreen, uploadThumbnail, type ScreenRow } from '../lib/screens';
 import { captureThumbnail } from '../lib/thumbnail';
 import { ScreenRenderer } from '../renderer/ScreenRenderer';
 import type { ScreenSchema } from '../schema/types';
+
+const tbBtn = { background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' } as const;
 
 export function ScreenPage() {
   const { id = '' } = useParams();
@@ -21,14 +24,12 @@ export function ScreenPage() {
       .catch((e) => setError(e.message ?? String(e)));
   }, [id]);
 
-  const downloadJson = () => {
+  const duplicate = async () => {
     if (!row) return;
-    const blob = new Blob([JSON.stringify(row.schema, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `${row.title}.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    const copy = await duplicateScreen(row);
+    const blob = await captureThumbnail(copy.schema);
+    if (blob) await updateScreen(copy.id, { thumbnail_path: await uploadThumbnail(copy.id, blob) });
+    navigate(`/screens/${copy.id}`);
   };
 
   const remove = async () => {
@@ -92,7 +93,7 @@ export function ScreenPage() {
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Toolbar>
         {heading}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center' }}>
           <Button
             variant="primary"
             size="sm"
@@ -102,31 +103,23 @@ export function ScreenPage() {
           >
             편집
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refreshThumbnail}
-            disabled={!row || thumbBusy}
-            style={{ background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' }}
-          >
-            {thumbBusy ? '썸네일 생성 중…' : '썸네일 갱신'}
+          <Button variant="outline" size="sm" onClick={duplicate} disabled={!row} style={tbBtn}>
+            복제
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={downloadJson}
-            disabled={!row}
-            style={{ background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' }}
-          >
-            JSON 내려받기
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={remove}
-            disabled={!row}
-            style={{ background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' }}
-          >
+          {row && (
+            <ExportMenu
+              schema={row.schema}
+              title={row.title}
+              meta={{
+                area: row.area,
+                pattern: row.pattern,
+                author: row.created_by_email ?? undefined,
+                updatedAt: row.updated_at.replace('T', ' ').slice(0, 16),
+              }}
+              extra={[{ label: '썸네일 갱신', hint: '목록 카드 이미지를 다시 생성', onSelect: refreshThumbnail, disabled: thumbBusy }]}
+            />
+          )}
+          <Button variant="outline" size="sm" onClick={remove} disabled={!row} style={tbBtn}>
             삭제
           </Button>
         </div>
