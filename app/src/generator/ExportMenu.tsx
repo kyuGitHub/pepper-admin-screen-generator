@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { copyText, exportJson, exportPng, exportSingleHtml, safeName, downloadText } from '../lib/export';
 import { buildSpec, specToHtml, specToMarkdown, type SpecMeta } from '../lib/spec';
 import type { ScreenSchema } from '../schema/types';
-import { Menu, type MenuItem } from './chrome';
+import { GenMenu, type GenMenuItem as MenuItem } from './ui';
 
 /* [내보내기 ▾] in the screen toolbar. Everything runs in the browser from the schema; nothing is uploaded. */
 
@@ -48,10 +48,5 @@ export function ExportMenu({ schema, title, meta, extra = [] }: { schema: Screen
     { label: 'JSON 내려받기', hint: '스키마 원본', onSelect: run('JSON 내려받기', () => exportJson(schema, title)) },
     ...(extra.length ? ['divider' as const, ...extra] : []),
   ];
-  return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-      {toast && <span style={{ fontSize: 12, color: 'var(--pp-gray-450)' }}>{toast}</span>}
-      <Menu label="내보내기" items={items} busy={busy ? `${busy} 중…` : undefined} />
-    </span>
-  );
+  return <GenMenu label="내보내기" items={items} busy={busy ? `${busy} 중…` : undefined} toast={toast || undefined} />;
 }

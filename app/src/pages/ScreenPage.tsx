@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Button } from '../design-system';
-import { Brand, Toolbar } from '../generator/chrome';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EditorFrame } from '../editor/EditorFrame';
 import { ExportMenu } from '../generator/ExportMenu';
+import { GenCanvas, GenPage, GenToolbar, GenToolbarButton, GenToolbarHeading } from '../generator/ui';
 import { deleteScreen, duplicateScreen, getScreen, updateScreen, uploadThumbnail, type ScreenRow } from '../lib/screens';
 import { captureThumbnail } from '../lib/thumbnail';
 import { ScreenRenderer } from '../renderer/ScreenRenderer';
 import type { ScreenSchema } from '../schema/types';
-
-const tbBtn = { background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' } as const;
 
 export function ScreenPage() {
   const { id = '' } = useParams();
@@ -43,19 +40,6 @@ export function ScreenPage() {
     navigate('/', { replace: true });
   };
 
-  const save = async (schema: ScreenSchema) => {
-    if (!row) return;
-    await updateScreen(row.id, { schema, title: schema.title });
-    let thumbnail_path = row.thumbnail_path;
-    const blob = await captureThumbnail(schema);
-    if (blob) {
-      thumbnail_path = await uploadThumbnail(row.id, blob);
-      await updateScreen(row.id, { thumbnail_path });
-    }
-    setRow({ ...row, schema, title: schema.title, thumbnail_path, updated_at: new Date().toISOString() });
-    setEditing(false);
-  };
-
   const [thumbBusy, setThumbBusy] = useState(false);
   const refreshThumbnail = async () => {
     if (!row) return;
@@ -74,43 +58,34 @@ export function ScreenPage() {
     }
   };
 
-  const heading = (
-    <>
-      <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 13 }}>
-        ← 목록
-      </Link>
-      <span style={{ color: 'var(--pp-gray-450)' }}>|</span>
-      <Brand />
-      {row && (
-        <>
-          <span style={{ marginLeft: 12, fontWeight: 700 }}>{row.title}</span>
-          <span style={{ fontSize: 11, color: 'var(--pp-gray-450)' }}>
-            {row.area} · {row.pattern}
-          </span>
-        </>
-      )}
-    </>
-  );
+  const save = async (schema: ScreenSchema) => {
+    if (!row) return;
+    await updateScreen(row.id, { schema, title: schema.title });
+    let thumbnail_path = row.thumbnail_path;
+    const blob = await captureThumbnail(schema);
+    if (blob) {
+      thumbnail_path = await uploadThumbnail(row.id, blob);
+      await updateScreen(row.id, { thumbnail_path });
+    }
+    setRow({ ...row, schema, title: schema.title, thumbnail_path, updated_at: new Date().toISOString() });
+    setEditing(false);
+  };
+
+  const heading = <GenToolbarHeading onBack={() => navigate('/')} title={row?.title} meta={row && `${row.area} · ${row.pattern}`} />;
 
   if (editing && row) return <EditorFrame schema={row.schema} heading={heading} onSave={save} onExit={() => setEditing(false)} aiEnabled />;
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Toolbar>
+    <GenPage fullHeight>
+      <GenToolbar>
         {heading}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center' }}>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setEditing(true)}
-            disabled={!row}
-            style={{ background: '#fff', color: 'var(--pp-navy-800)', borderColor: '#fff' }}
-          >
+          <GenToolbarButton tone="primary" onClick={() => setEditing(true)} disabled={!row}>
             편집
-          </Button>
-          <Button variant="outline" size="sm" onClick={duplicate} disabled={!row} style={tbBtn}>
+          </GenToolbarButton>
+          <GenToolbarButton onClick={duplicate} disabled={!row}>
             복제
-          </Button>
+          </GenToolbarButton>
           {row && (
             <ExportMenu
               schema={row.schema}
@@ -124,15 +99,19 @@ export function ScreenPage() {
               extra={[{ label: '썸네일 갱신', hint: '목록 카드 이미지를 다시 생성', onSelect: refreshThumbnail, disabled: thumbBusy }]}
             />
           )}
-          <Button variant="outline" size="sm" onClick={remove} disabled={!row} style={tbBtn}>
+          <GenToolbarButton tone="danger" onClick={remove} disabled={!row}>
             삭제
-          </Button>
+          </GenToolbarButton>
         </div>
-      </Toolbar>
-      <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-        {error && <div style={{ padding: 30, color: 'var(--bs-danger)', fontFamily: 'var(--font-sans)', fontSize: 13 }}>불러오기 실패: {error}</div>}
-        {row && <ScreenRenderer schema={row.schema} />}
+      </GenToolbar>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
+        {error && <div style={{ padding: 30, color: 'var(--gen-danger)', fontSize: 13 }}>불러오기 실패: {error}</div>}
+        {row && (
+          <GenCanvas label={row.title} meta="1860 × 1100">
+            <ScreenRenderer schema={row.schema} />
+          </GenCanvas>
+        )}
       </div>
-    </div>
+    </GenPage>
   );
 }

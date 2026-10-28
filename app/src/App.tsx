@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
 import { EditorFrame } from './editor/EditorFrame';
 import { ThumbnailCheck } from './pages/ThumbnailCheck';
@@ -7,6 +7,7 @@ import { DemoScreenPage } from './pages/DemoScreenPage';
 import { IntakePage } from './pages/IntakePage';
 import { GuidePage } from './pages/GuidePage';
 import { GeneratePage } from './pages/GeneratePage';
+import { KitPage } from './pages/KitPage';
 import { isConfigured } from './lib/supabase';
 import { LoginPage } from './pages/LoginPage';
 import { ScreenListPage } from './pages/ScreenListPage';
@@ -30,8 +31,20 @@ export function App() {
     const params = new URLSearchParams(window.location.search);
     const key = params.get('screen') ?? 'loanApplicationDetail';
     const sample = SAMPLE_SCREENS[key] ?? SAMPLE_SCREENS.loanApplicationDetail;
-    if (params.get('intake')) return <IntakePage demo />;
-    if (params.get('guide')) return <GuidePage demo />;
+    if (params.get('kit')) return <KitPage />;
+    // The demo pages use router hooks for links; a memory router keeps them working without URLs.
+    if (params.get('intake'))
+      return (
+        <MemoryRouter>
+          <IntakePage demo />
+        </MemoryRouter>
+      );
+    if (params.get('guide'))
+      return (
+        <MemoryRouter>
+          <GuidePage demo />
+        </MemoryRouter>
+      );
     // ?thumb=1 shows what the thumbnail capture produces for the sample (debugging aid, no database needed).
     if (params.get('thumb')) return <ThumbnailCheck schema={sample.schema} />;
     // ?tools=1 shows the sample with the export menu (no database needed).

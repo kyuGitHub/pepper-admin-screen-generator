@@ -40,7 +40,7 @@ AI 생성은 Claude(Max 계정)에서, 앱은 요청서와 프롬프트만 만�
 
 - `/intake` **요청서 만들기** — 화면명·메뉴 경로·목적·항목(패널별)·검색 조건/목록 열·버튼과 동작·팝업·케이스·특이사항을 적으면 오른쪽에 Claude용 프롬프트가 만들어집니다. [AI로 바로 생성]을 누르면 같은 내용으로 앱 안에서 생성합니다. 프롬프트에는 스키마 작성 규칙(`src/lib/schemaGuide.md`)과 참고 화면(내장 샘플 또는 저장된 화면)의 JSON이 포함되어 같은 형식으로 나옵니다. 입력은 브라우저에 자동 저장됩니다.
 - `/guide` **사용 안내** — 6단계 흐름, 요령, PM 파일럿 체크리스트, 인테이크 질문지·스키마 규칙 .md 내려받기.
-- 데모 모드: `?intake=1`, `?guide=1`.
+- 데모 모드: `?intake=1`, `?guide=1`, `?kit=1`(컴포넌트 갤러리).
 
 ## 샘플 데이터 자동 생성
 `src/lib/sampleData.ts`가 라벨·데이터 키·단위로 값을 추정합니다 (금액→콤마 숫자, 일시→`2026-10-01 10:23:45`, 여부→Y/N, 처리자→`이름(사번)`, 셀렉트→옵션 중 하나 …). 같은 키는 항상 같은 값이 나오며 실제 고객 정보는 쓰지 않습니다.
@@ -86,11 +86,20 @@ AI 생성은 Claude(Max 계정)에서, 앱은 요청서와 프롬프트만 만�
 - 데모 모드(Supabase 미설정)에서는 `?screen=<key>&edit=1`로 열리고, [저장] 대신 [JSON 내려받기]가 됩니다. `?screen=<key>&thumb=1`은 썸네일 캡처 결과를 보여 줍니다(디버깅용).
 - 구현: `src/editor/` (`EditorContext` 선택·초안·되돌리기, `PropertyPanel` 속성 폼, `EditorFrame` 편집 화면 틀, `paths` 스키마 경로 수정 도우미). 렌더러는 편집 컨텍스트가 있을 때만 요소를 `Selectable`로 감쌉니다.
 
+## 두 개의 디자인시스템
+| 영역 | 디자인시스템 | 코드 |
+| --- | --- | --- |
+| 렌더러가 그리는 **어드민 화면** (캔버스 안, 내보낸 HTML·PNG·썸네일) | Pepper Digital Admin (`--pp-*`, NanumSquare, 네이비·페퍼 레드, 밀도 우선) | `src/design-system/` |
+| **제너레이터 UI** (로그인, 화면 목록, 업로드, 툴바·메뉴, 편집기 속성 패널, AI 생성, 요청서, 안내) | Generator (`--gen-*`, IBM Plex Sans KR·Mono, 다크 작업공간, 에디터 블루) | `src/generator/tokens.css`, `src/generator/ui.tsx` |
+
+Generator 디자인시스템은 Claude Design의 "화면 제너레이터 — UI kit"(2026-10-28)에서 가져왔습니다. 어드민 화면은 제너레이터 안에서 1860×1100 프레임(`GenCanvas`)에 놓이며, 스키마의 `100vh` 높이는 프레임 높이를 따릅니다(`--screen-vh`). 데모 모드 `?kit=1`에서 컴포넌트 갤러리를 볼 수 있습니다.
+
 ## 구조
 
 | 경로 | 내용 |
 | --- | --- |
-| `src/design-system/` | 디자인시스템 번들(`_ds_bundle.js`) 포팅: Button, Input, Select, Checkbox/Radio, InputGroup, Panel, FieldTable, Tabs, Modal, AppHeader, Lnb + 토큰/폰트/이미지 |
+| `src/design-system/` | Digital Admin 디자인시스템 포팅(어드민 화면 전용): Button, Input, Select, Checkbox/Radio, InputGroup, Panel, FieldTable, Tabs, Modal, AppHeader, Lnb + 토큰/폰트/이미지 |
+| `src/generator/` | Generator 디자인시스템(제너레이터 UI 전용): 토큰, GenButton·GenInput·GenSelect·GenTextarea·GenCheckbox·GenCodeArea·GenToolbar·GenMenu·GenDialog·GenScreenCard·GenCanvas·GenPropertyPanel 등 27종, 내보내기 메뉴 |
 | `src/schema/types.ts` | 화면 스키마 정의 (탭 → 열 → 패널/반복그룹 → 블록·필드·액션) |
 | `src/renderer/` | 스키마 렌더러와 목업 런타임 (수정→저장/취소, 정보변경이력, 마스킹, 접기/펼치기, 모달, 합계 계산) |
 | `src/editor/` | 클릭 편집기 (요소 선택, 속성 패널, 추가·삭제·순서, 실행취소, 저장) |

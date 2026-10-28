@@ -1,13 +1,12 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Button } from '../design-system';
-import { Brand, Toolbar } from '../generator/chrome';
+import { GenBrand, GenCanvas, GenModeBadge, GenPage, GenToolbar, GenToolbarButton } from '../generator/ui';
 import { ScreenRenderer } from '../renderer/ScreenRenderer';
 import type { ScreenSchema } from '../schema/types';
 import { EditorProvider, clickHandled, useEditorRequired } from './EditorContext';
 import { PropertyPanel } from './PropertyPanel';
 import { AiModifyBar } from './AiModifyBar';
 
-/* Edit mode of a screen: navy toolbar with 실행취소/취소/저장, live preview on the left, property panel on the right. */
+/* Edit mode of a screen: generator toolbar with 실행취소/취소/저장, the admin screen on the canvas, property panel on the right. */
 
 export interface EditorFrameProps {
   schema: ScreenSchema;
@@ -27,8 +26,6 @@ export function EditorFrame(props: EditorFrameProps) {
     </EditorProvider>
   );
 }
-
-const tbBtn = { background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' } as const;
 
 function Frame({ heading, onSave, onExit, saveLabel = '저장', aiEnabled = false }: EditorFrameProps) {
   const ed = useEditorRequired();
@@ -77,53 +74,38 @@ function Frame({ heading, onSave, onExit, saveLabel = '저장', aiEnabled = fals
   };
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Toolbar>
-        {heading ?? <Brand />}
-        <span
-          style={{
-            marginLeft: 10,
-            padding: '1px 8px',
-            borderRadius: 10,
-            background: ed.dirty ? 'var(--bs-warning, #f0ad4e)' : 'var(--pp-navy-500)',
-            color: ed.dirty ? 'var(--pp-gray-900)' : '#fff',
-            fontSize: 11,
-            fontWeight: 700,
-          }}
-        >
-          {ed.dirty ? '편집 중 · 저장 안 됨' : '편집 모드'}
-        </span>
-        {error && <span style={{ color: '#ffb3b3', fontSize: 12, marginLeft: 10 }}>저장 실패: {error}</span>}
+    <GenPage fullHeight>
+      <GenToolbar>
+        {heading ?? <GenBrand />}
+        <GenModeBadge dirty={ed.dirty} />
+        {error && <span style={{ color: 'var(--gen-danger)', fontSize: 12, marginLeft: 6 }}>저장 실패: {error}</span>}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
           {aiEnabled && (
-            <Button variant="outline" size="sm" onClick={() => setAiOpen((o) => !o)} style={{ ...tbBtn, borderColor: aiOpen ? '#fff' : 'var(--pp-navy-300)' }}>
+            <GenToolbarButton
+              onClick={() => setAiOpen((o) => !o)}
+              style={aiOpen ? { borderColor: 'var(--gen-accent)', color: 'var(--gen-accent-text)' } : undefined}
+            >
               AI 수정
-            </Button>
+            </GenToolbarButton>
           )}
-          <Button variant="outline" size="sm" onClick={ed.undo} disabled={!ed.canUndo} style={tbBtn}>
+          <GenToolbarButton onClick={ed.undo} disabled={!ed.canUndo}>
             실행취소
-          </Button>
-          <Button variant="outline" size="sm" onClick={exit} disabled={saving} style={tbBtn}>
+          </GenToolbarButton>
+          <GenToolbarButton onClick={exit} disabled={saving}>
             취소
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={save}
-            disabled={saving || !ed.dirty}
-            style={{ background: '#fff', color: 'var(--pp-navy-800)', borderColor: '#fff' }}
-          >
+          </GenToolbarButton>
+          <GenToolbarButton tone="primary" onClick={save} disabled={saving || !ed.dirty}>
             {saving ? '저장 중…' : saveLabel}
-          </Button>
+          </GenToolbarButton>
         </div>
-      </Toolbar>
+      </GenToolbar>
       {aiEnabled && aiOpen && <AiModifyBar onClose={() => setAiOpen(false)} />}
       <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
-        <div style={{ flex: 1, minWidth: 0, overflow: 'auto' }} onClick={(e) => !clickHandled(e) && ed.select(null)}>
+        <GenCanvas label={ed.draft.title} meta="1860 × 1100 · 클릭해서 선택" onBackgroundClick={(e) => !clickHandled(e) && ed.select(null)}>
           <ScreenRenderer schema={ed.draft} />
-        </div>
+        </GenCanvas>
         <PropertyPanel />
       </div>
-    </div>
+    </GenPage>
   );
 }

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ClipboardEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button, Select, Textarea } from '../design-system';
-import { Brand, Toolbar } from '../generator/chrome';
+import { useNavigate } from 'react-router-dom';
+import { GenButton, GenCodeArea, GenField, GenPage, GenSection, GenSelect, GenTextarea, GenToolbar, GenToolbarHeading } from '../generator/ui';
 import { formatUsage, runAi, toAiImage } from '../lib/ai';
 import { fillSampleData } from '../lib/sampleData';
 import { AREAS, PATTERNS, createScreen, getScreen, listScreens, updateScreen, uploadThumbnail, type ScreenSummary } from '../lib/screens';
@@ -124,77 +123,68 @@ export function GeneratePage() {
     }
   };
 
-  return (
-    <div style={{ minHeight: '100vh', background: 'var(--pp-gray-80)', fontFamily: 'var(--font-sans)', color: 'var(--pp-gray-900)' }}>
-      <Toolbar>
-        <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 13 }}>
-          ← 목록
-        </Link>
-        <span style={{ color: 'var(--pp-gray-450)' }}>|</span>
-        <Brand />
-        <span style={{ marginLeft: 12, fontWeight: 700 }}>AI로 화면 만들기</span>
-      </Toolbar>
+  const modelOptions = [
+    { value: 'sonnet', label: 'Sonnet 5.5 · 기본 (화면당 약 350~650원)' },
+    { value: 'opus', label: 'Opus 5.5 · 고품질 (약 2배 비용)' },
+  ];
+  const logText = [...log, ...(busy && chars > 0 ? [`받은 출력 ${chars.toLocaleString()}자…`] : []), ...(error ? [`오류: ${error}`] : [])].join('\n');
 
-      <main style={{ maxWidth: 1500, margin: '0 auto', padding: '24px 30px', display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) minmax(0, 2fr)', gap: 24 }}>
-        <section>
-          <h1 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 700 }}>요구사항</h1>
-          <p style={{ margin: '0 0 12px', fontSize: 12, color: 'var(--pp-gray-700)', lineHeight: 1.6 }}>
-            화면명, 누가 무엇을 하는지, 패널별 항목, 검색 조건·목록 열, 버튼과 동작, 팝업을 적습니다. 기존 어드민 캡처나 손그림을 붙이면 그 레이아웃을 따릅니다.
-            자세한 양식은 <Link to="/intake">요청서 만들기</Link>에서 채운 뒤 [AI로 바로 생성]을 눌러도 됩니다.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <label style={lab}>
-              영역
-              <Select value={area} options={[...AREAS]} onChange={(e) => setArea(e.target.value)} style={{ width: '100%' }} disabled={busy} />
-            </label>
-            <label style={lab}>
-              패턴
-              <Select value={pattern} options={[...PATTERNS]} onChange={(e) => pickPattern(e.target.value)} style={{ width: '100%' }} disabled={busy} />
-            </label>
-            <label style={lab}>
-              모델
-              <Select
-                value={model}
-                options={[
-                  { value: 'sonnet', label: 'Sonnet 5.5 · 기본 (화면당 약 350~650원)' },
-                  { value: 'opus', label: 'Opus 5.5 · 고품질 (약 2배 비용)' },
-                ]}
-                onChange={(e) => setModel(e.target.value as 'sonnet' | 'opus')}
-                style={{ width: '100%' }}
-                disabled={busy}
-              />
-            </label>
+  return (
+    <GenPage>
+      <GenToolbar>
+        <GenToolbarHeading onBack={() => navigate('/')} title="AI로 화면 만들기" />
+        {busy && (
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--gen-accent-text)', fontFamily: 'var(--gen-font-mono)' }}>생성 중 · {elapsed}s</span>
+        )}
+      </GenToolbar>
+
+      <main style={{ maxWidth: 1500, margin: '0 auto', padding: '28px 32px', display: 'grid', gridTemplateColumns: 'minmax(0, 3fr) minmax(0, 2fr)', gap: 20 }}>
+        <GenSection
+          n="01"
+          title="요구사항"
+          lead={
+            <>
+              화면명, 누가 무엇을 하는지, 패널별 항목, 검색 조건·목록 열, 버튼과 동작, 팝업을 적습니다. 기존 어드민 캡처나 손그림을 붙이면 그 레이아웃을
+              따릅니다. 자세한 양식은{' '}
+              <a href="/intake" onClick={(e) => (e.preventDefault(), navigate('/intake'))}>
+                요청서 만들기
+              </a>
+              에서 채운 뒤 [AI로 바로 생성]을 눌러도 됩니다.
+            </>
+          }
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.6fr', gap: 12 }}>
+            <GenField label="영역">
+              <GenSelect value={area} options={[...AREAS]} onChange={(e) => setArea(e.target.value)} disabled={busy} />
+            </GenField>
+            <GenField label="패턴">
+              <GenSelect value={pattern} options={[...PATTERNS]} onChange={(e) => pickPattern(e.target.value)} disabled={busy} />
+            </GenField>
+            <GenField label="모델">
+              <GenSelect value={model} options={modelOptions} onChange={(e) => setModel(e.target.value as 'sonnet' | 'opus')} disabled={busy} />
+            </GenField>
           </div>
-          <Textarea
-            rows={16}
-            value={request}
-            placeholder={HINT}
-            onChange={(e) => setRequest(e.target.value)}
-            onPaste={onPaste}
-            disabled={busy}
-            style={{ width: '100%', boxSizing: 'border-box', fontSize: 12, lineHeight: 1.6 }}
-          />
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 10 }}>
-            <label style={{ ...lab, flex: 1 }}>
-              참고 화면 (같은 형식·같은 메뉴 구조로 생성)
-              <Select value={refKey} options={refOptions} onChange={(e) => setRefKey(e.target.value)} style={{ width: '100%' }} disabled={busy} />
-            </label>
-          </div>
-          <div style={{ marginTop: 12 }}>
-            <div style={lab}>캡처 이미지 (최대 4장, 텍스트 칸에 붙여넣기 가능)</div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginTop: 6 }}>
+          <GenField label="요구사항" required>
+            <GenTextarea rows={16} value={request} placeholder={HINT} onChange={(e) => setRequest(e.target.value)} onPaste={onPaste} disabled={busy} />
+          </GenField>
+          <GenField label="참고 화면 (같은 형식·같은 메뉴 구조로 생성)">
+            <GenSelect value={refKey} options={refOptions} onChange={(e) => setRefKey(e.target.value)} disabled={busy} />
+          </GenField>
+          <GenField label="캡처 이미지 (최대 4장, 요구사항 칸에 붙여넣기 가능)">
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               {images.map((im, i) => (
                 <div key={i} style={{ position: 'relative' }}>
                   <img
                     src={`data:${im.img.media_type};base64,${im.img.data}`}
                     alt={im.name}
                     title={im.name}
-                    style={{ height: 70, border: '1px solid var(--border-default)', borderRadius: 4 }}
+                    style={{ height: 70, border: '1px solid var(--gen-border-control)', borderRadius: 4, display: 'block' }}
                   />
                   <button
                     type="button"
                     onClick={() => setImages((cur) => cur.filter((_, j) => j !== i))}
                     disabled={busy}
+                    aria-label="이미지 제거"
                     style={{
                       position: 'absolute',
                       top: -6,
@@ -203,12 +193,13 @@ export function GeneratePage() {
                       height: 18,
                       borderRadius: 9,
                       border: 0,
-                      background: 'var(--pp-gray-800)',
+                      background: 'var(--gen-danger)',
                       color: '#fff',
                       fontSize: 11,
                       cursor: 'pointer',
+                      lineHeight: '18px',
+                      padding: 0,
                     }}
-                    aria-label="이미지 제거"
                   >
                     ×
                   </button>
@@ -216,7 +207,14 @@ export function GeneratePage() {
               ))}
               {images.length < 4 && (
                 <label
-                  style={{ fontSize: 12, padding: '6px 10px', border: '1px dashed var(--pp-gray-350)', borderRadius: 4, cursor: 'pointer', background: '#fff' }}
+                  style={{
+                    fontSize: 12,
+                    padding: '6px 10px',
+                    border: '1px dashed var(--gen-border-hover)',
+                    borderRadius: 6,
+                    cursor: 'pointer',
+                    color: 'var(--gen-text-sub)',
+                  }}
                 >
                   + 이미지 선택
                   <input
@@ -230,49 +228,35 @@ export function GeneratePage() {
                 </label>
               )}
             </div>
-          </div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 16, alignItems: 'center' }}>
-            <Button variant="primary" onClick={generate} disabled={busy || !request.trim()} style={{ height: 34, padding: '0 18px' }}>
+          </GenField>
+          <div style={{ display: 'flex', gap: 8, marginTop: 4, alignItems: 'center' }}>
+            <GenButton variant="primary" size="lg" onClick={generate} disabled={busy || !request.trim()}>
               {busy ? `생성 중… ${elapsed}초` : 'AI로 만들기'}
-            </Button>
+            </GenButton>
             {busy && (
-              <Button variant="outline" onClick={() => abort.current?.abort()} style={{ height: 34 }}>
+              <GenButton size="lg" onClick={() => abort.current?.abort()}>
                 중단
-              </Button>
+              </GenButton>
             )}
-            <span style={{ fontSize: 11, color: 'var(--pp-gray-600)' }}>보통 1~3분 걸립니다. 완료되면 편집 모드로 바로 열립니다.</span>
+            <span style={{ fontSize: 11, color: 'var(--gen-text-hint)' }}>보통 1~3분 걸립니다. 완료되면 편집 모드로 바로 열립니다.</span>
           </div>
-        </section>
+        </GenSection>
 
-        <section>
-          <h1 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 700 }}>진행 상황</h1>
-          <div
+        <GenSection n="02" title="진행 상황" style={{ position: 'sticky', top: 16, alignSelf: 'start' }}>
+          <GenCodeArea
+            size="sm"
+            readOnly
+            value={logText}
+            placeholder="[AI로 만들기]를 누르면 여기에 진행 상황이 표시됩니다."
+            height={320}
             data-testid="ai-log"
-            style={{
-              background: '#fff',
-              border: '1px solid var(--border-default)',
-              borderRadius: 8,
-              padding: 14,
-              minHeight: 240,
-              fontSize: 12,
-              lineHeight: 1.7,
-            }}
-          >
-            {log.length === 0 && !error && <span style={{ color: 'var(--pp-gray-500)' }}>[AI로 만들기]를 누르면 여기에 진행 상황이 표시됩니다.</span>}
-            {log.map((l, i) => (
-              <div key={i}>{l}</div>
-            ))}
-            {busy && chars > 0 && <div style={{ color: 'var(--pp-gray-600)' }}>받은 출력 {chars.toLocaleString()}자…</div>}
-            {error && <div style={{ color: 'var(--bs-danger)', marginTop: 6 }}>{error}</div>}
-          </div>
-          <div style={{ fontSize: 11, color: 'var(--pp-gray-600)', marginTop: 10, lineHeight: 1.6 }}>
+          />
+          <div style={{ fontSize: 11, color: 'var(--gen-text-hint)', marginTop: 10, lineHeight: 1.6 }}>
             결과는 검증을 거쳐 저장되고 빈 값은 샘플 데이터로 채워집니다. 마음에 안 들면 편집 모드의 [AI 수정]으로 문장으로 고치거나, 요구사항을 보강해 다시
             만드세요. 사용량은 사용자별로 하루 한도 안에서 기록됩니다.
           </div>
-        </section>
+        </GenSection>
       </main>
-    </div>
+    </GenPage>
   );
 }
-
-const lab = { display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--pp-gray-800)' } as const;
