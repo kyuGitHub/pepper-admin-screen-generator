@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { Button, Input } from '../design-system';
 import { Brand, Toolbar } from '../generator/chrome';
@@ -68,6 +68,12 @@ export function ScreenListPage() {
             style={{ marginLeft: 'auto' }}
             inputStyle={{ height: 34, fontSize: 13 }}
           />
+          <Link to="/intake" style={{ fontSize: 13, color: 'var(--pp-navy-800)', whiteSpace: 'nowrap' }}>
+            요청서 만들기
+          </Link>
+          <Link to="/guide" style={{ fontSize: 13, color: 'var(--pp-navy-800)', whiteSpace: 'nowrap' }}>
+            사용 안내
+          </Link>
           <Button variant="danger" onClick={() => setUploadOpen(true)} style={{ height: 34 }}>
             새 화면 올리기
           </Button>
