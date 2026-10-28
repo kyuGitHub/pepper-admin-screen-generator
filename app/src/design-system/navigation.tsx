@@ -43,6 +43,8 @@ export interface AppHeaderProps {
   history?: string[];
   onLogout?: () => void;
   fixed?: boolean;
+  /** Red environment tag before the shortcuts, e.g. "테스트(Staging)". */
+  envLabel?: string;
   style?: CSSProperties;
 }
 
@@ -57,6 +59,7 @@ export function AppHeader({
   history = ['메뉴이력'],
   onLogout,
   fixed = false,
+  envLabel,
   style,
 }: AppHeaderProps) {
   const [hover, setHover] = useState<string | null>(null);
@@ -131,6 +134,7 @@ export function AppHeader({
           })}
         </ul>
         <div style={{ position: 'absolute', top: 0, right: 30, height: '100%', display: 'flex', alignItems: 'center' }}>
+          {envLabel && <span style={{ marginRight: 24, fontSize: 13, fontWeight: 700, color: 'var(--pp-red-400)' }}>{envLabel}</span>}
           <div style={{ display: 'flex', gap: 5 }}>
             <HeaderSelect options={shortcuts} />
             <HeaderSelect options={history} lg />

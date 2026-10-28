@@ -63,10 +63,12 @@ export interface FieldTableProps {
   labelWidth?: string;
   valueWidth?: string;
   variant?: 'borderless' | 'bordered';
+  /** Label cell text alignment (edit modals use right). */
+  labelAlign?: 'left' | 'right';
   style?: CSSProperties;
 }
 
-export function FieldTable({ rows = [], columns = 4, labelWidth, valueWidth, variant = 'borderless', style }: FieldTableProps) {
+export function FieldTable({ rows = [], columns = 4, labelWidth, valueWidth, variant = 'borderless', labelAlign = 'left', style }: FieldTableProps) {
   const lw = labelWidth ?? (columns === 4 ? '10%' : columns === 3 ? '11%' : columns === 2 ? '20%' : '15%');
   const vw = valueWidth ?? (columns === 4 ? '15%' : columns === 3 ? '22.33%' : columns === 2 ? '30%' : '85%');
   const bordered = variant === 'bordered';
@@ -94,7 +96,7 @@ export function FieldTable({ rows = [], columns = 4, labelWidth, valueWidth, var
                   style={{
                     padding: cellPad,
                     border: bd,
-                    textAlign: 'left',
+                    textAlign: labelAlign,
                     fontWeight: 700,
                     color: 'var(--pp-gray-800)',
                     lineHeight: 1.2,

@@ -35,7 +35,9 @@ export type ActionSchema =
   /** Opens a modal declared in `ScreenSchema.modals`. */
   | { type: 'modal'; label: string; modal: string; variant?: ButtonVariant }
   /** Saves the panel's always-editable select fields; disabled until something changed. */
-  | { type: 'formSave'; label?: string };
+  | { type: 'formSave'; label?: string }
+  /** Only inside a `searchBar`: toggles its `detailRows` (label gets ^ / v appended). */
+  | { type: 'detailToggle'; label?: string };
 
 /* ------------------------------------------------------------------ field tables */
 
@@ -55,10 +57,29 @@ export interface FieldCellSchema {
   /** Inert small button after the value (e.g. 체크리스트). */
   button?: { label: string; variant?: ButtonVariant };
   /** Always-editable control instead of a read-only input; saved with a `formSave` action. */
-  control?: { type: 'select'; options: string[]; placeholder?: string };
+  control?: FieldControlSchema;
+  /** In an editable `fields` block, keeps this one field read-only (grey). */
+  readOnly?: boolean;
+  /** Byte counter drawn inside the input ("36 / 100 byte"). */
+  counter?: { max: number; value?: number };
 }
 
-export type FieldTableCellSchema = FieldCellSchema | { blank: number } | { note: string; span?: number };
+/** Editable input kinds. In a read-only panel only `select` is live (saved with `formSave`); in an editable block all are. */
+export type FieldControlSchema =
+  | { type: 'select'; options: string[]; placeholder?: string }
+  | { type: 'text'; placeholder?: string }
+  | { type: 'date' }
+  | { type: 'time' }
+  | { type: 'textarea'; rows?: number }
+  | { type: 'file' }
+  | { type: 'color' };
+
+export type FieldTableCellSchema =
+  | FieldCellSchema
+  | { blank: number }
+  | { note: string; span?: number }
+  /** Buttons occupying a label+value pair (e.g. [초기화] at the end of a form row). */
+  | { buttons: ActionSchema[]; span?: number; align?: 'left' | 'right' };
 
 /* ------------------------------------------------------------------ data tables */
 
@@ -84,7 +105,36 @@ export type TableRow = Record<string, string>;
 /* ------------------------------------------------------------------ blocks (panel body) */
 
 export type BlockSchema =
-  | { type: 'fields'; columns: number; labelWidth?: string; valueWidth?: string; rows: FieldTableCellSchema[][] }
+  /** `editable`: every field renders as a live input (edit modals); `readOnly` on a field keeps it grey. */
+  | {
+      type: 'fields';
+      columns: number;
+      labelWidth?: string;
+      valueWidth?: string;
+      labelAlign?: 'left' | 'right';
+      editable?: boolean;
+      rows: FieldTableCellSchema[][];
+    }
+  /** List-screen filter rows. `detailRows` are toggled by the 상세검색 button; `rightActions` sit at the far right. */
+  | { type: 'searchBar'; rows: FilterSchema[][]; detailRows?: FilterSchema[][]; detailOpen?: boolean; actions?: ActionSchema[]; rightActions?: ActionSchema[] }
+  /** rMate-style data grid with optional page-size select and pagination (mock: page buttons highlight only). */
+  | {
+      type: 'grid';
+      table: string;
+      columns: GridColumnSchema[];
+      height?: number;
+      minWidth?: number;
+      countText?: TemplateText;
+      pagination?: { pageSize: number; pageSizes?: number[]; totalPages?: number; page?: number };
+    }
+  /** Sub-section behind a dark toggle chip ("수수료 관련정보 ^"). */
+  | { type: 'collapsible'; title: string; open?: boolean; blocks: BlockSchema[] }
+  /** Tabs inside a panel or modal. */
+  | { type: 'tabs'; items: { label: string; blocks: BlockSchema[] }[] }
+  /** Rich-text editor placeholder: toolbar look + optional content lines. */
+  | { type: 'editor'; height?: number; content?: string[] }
+  /** A row of buttons; `align` defaults to left. */
+  | { type: 'actionRow'; items: ActionSchema[]; align?: 'left' | 'right' }
   | { type: 'heading'; text: TemplateText; meta?: TemplateText }
   /** Horizontal rule; `tight` drops the space above it. */
   | { type: 'divider'; tight?: boolean }
@@ -108,6 +158,31 @@ export type BlockSchema =
   | { type: 'kvTable'; rows: [string, string, string, string][] }
   | { type: 'text'; text: string; tone?: 'muted' }
   | { type: 'empty'; text: string };
+
+export type FilterSchema =
+  /** The first option doubles as the field name (기간, 상품구분 …). */
+  | { type: 'select'; options: string[]; width?: number }
+  | { type: 'dateRange'; start?: string; end?: string }
+  | { type: 'text'; placeholder?: string; width?: number }
+  | { type: 'checkbox'; label: string; checked?: boolean };
+
+export interface GridColumnSchema {
+  key: string;
+  label: string;
+  width?: number | string;
+  align?: 'left' | 'center' | 'right';
+  /** `no` prints the 1-based row number; `link` is navy underlined text; `button`/`buttons` render small outline buttons. */
+  kind?: 'text' | 'no' | 'link' | 'button' | 'buttons';
+  /** For `button`: the label; the cell value gates it when `whenValue` is set. */
+  buttonLabel?: string;
+  whenValue?: string;
+  /** For `buttons`: one small button per entry. */
+  buttons?: { label: string; modal?: string }[];
+  /** Modal opened when a `link`/`button` cell is clicked. */
+  modal?: string;
+  bold?: boolean;
+  tones?: Record<string, string>;
+}
 
 export type ControlSchema =
   | { type: 'radio'; name: string; options: { label: string; value: string }[]; defaultValue?: string }
@@ -167,7 +242,11 @@ export interface ModalSchema {
   title: string;
   width?: number;
   blocks: BlockSchema[];
+  /** Gap between blocks (default 0 for read-only detail popups, use 10 for edit forms). */
+  blockGap?: number;
   closeLabel?: string;
+  /** Custom footer; `right` replaces the default 닫기 button. A `button` with label 닫기/취소 closes the modal. */
+  footer?: { left?: ActionSchema[]; right?: ActionSchema[] };
 }
 
 /* ------------------------------------------------------------------ shell & screen */
@@ -192,12 +271,26 @@ export interface ScreenSchema {
   id: string;
   title: string;
   shell: {
-    header: { menu: string[]; active: string; userName: string; userPosition: string; lastLogin?: string; shortcuts: string[]; history: string[] };
+    header: {
+      menu: string[];
+      active: string;
+      userName: string;
+      userPosition: string;
+      lastLogin?: string;
+      shortcuts: string[];
+      history: string[];
+      envLabel?: string;
+    };
     lnb: { tabs: string[]; tree: LnbNodeSchema[]; activeId: string };
   };
+  /** Star after the title: true = filled (즐겨찾기), false = outline, omitted = none. */
+  favorite?: boolean;
   toolbar: { search?: { placeholder: string; width?: number; submitLabel: string }; actions: ActionSchema[] };
   /** Panels shown above the tabs in a two-column grid. */
   summary: PanelSchema[];
+  /** Full-width blocks between the toolbar and the tabs; list screens put their searchBar + grid here. */
+  body?: BlockSchema[];
+  /** Empty → no tab bar. */
   tabs: TabSchema[];
   modals?: ModalSchema[];
   data: { values: Record<string, string>; tables: Record<string, TableRow[]> };

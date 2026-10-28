@@ -34,6 +34,19 @@ npm run build          # 타입체크 + dist/ 빌드
 
 모든 변경은 메모리에만 저장되며 새로고침하면 초기화됩니다.
 
+## 내장 샘플 화면
+`src/screens/index.ts`에 등록된 샘플은 데모 모드에서 `?screen=<key>`로 열 수 있고, [새 화면 올리기]의 샘플 선택에도 나옵니다.
+
+| key | 화면 | 패턴 |
+| --- | --- | --- |
+| `loanApplicationDetail` | 대출신청 상세정보 v3 | 상세 |
+| `channelList` | 채널 목록 + 채널 설정 | 목록 + 편집 모달 |
+| `loanProductList` | 여신 상품 목록 + 여신 상품안내 설정 | 목록 + 편집 모달 |
+| `notificationList` | 알림 설정 목록 + 알림 설정 | 목록 + 편집 모달 |
+| `bannerPopupList` | 배너팝업 목록 + 배너 팝업 설정 | 목록 + 편집 모달 |
+
+목록 화면은 `body` 블록(`searchBar` + `grid`)으로, 편집 모달은 `modals[].blocks`의 `fields(editable)`·`collapsible`·`tabs`·`editor`로 정의합니다. 전체 블록 목록은 `src/schema/types.ts`를 보세요.
+
 ## 단일 HTML로 보기
 `npm run build:single`을 실행하면 `preview/대출신청 상세정보 v3.html`이 다시 만들어집니다. 폰트·이미지까지 한 파일에 들어 있어 더블클릭으로 오프라인에서 열립니다.
 
