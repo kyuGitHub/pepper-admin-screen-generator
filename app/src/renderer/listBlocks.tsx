@@ -74,7 +74,7 @@ export function GridBlock({ block: b }: { block: Extract<BlockSchema, { type: 'g
     label: c.label,
     width: c.width,
     align: c.align ?? (c.kind === 'link' || c.kind === 'text' ? 'left' : 'center'),
-    render: (v, r, i) => renderCell(c, String(v ?? ''), r, i, open),
+    render: (v, r, i) => renderCell(c, String(v ?? ''), r, i + (page - 1) * pageSize, open),
   }));
 
   return (

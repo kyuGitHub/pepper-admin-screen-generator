@@ -234,6 +234,17 @@ function FieldsBlock({ block, panel }: { block: Extract<BlockSchema, { type: 'fi
 function toCell(c: FieldTableCellSchema, panel?: PanelSchema, editable?: boolean): FieldTableCell {
   if ('blank' in c) return { raw: '', colSpan: c.blank * 2 };
   if ('note' in c) return { raw: <span style={{ fontSize: 12, color: '#707070', paddingLeft: 5 }}>{c.note}</span>, colSpan: (c.span ?? 1) * 2 };
+  if ('buttons' in c)
+    return {
+      raw: (
+        <div style={{ display: 'flex', gap: 4, justifyContent: c.align === 'right' ? 'flex-end' : 'flex-start' }}>
+          {c.buttons.map((a, i) => (
+            <ActionButton key={i} action={a} panel={panel} size="sm" />
+          ))}
+        </div>
+      ),
+      colSpan: (c.span ?? 1) * 2,
+    };
   if (!isField(c)) return { raw: '' };
   return { label: c.label, span: c.span, render: editable && !c.readOnly ? <EditableField field={c} /> : <FieldValue field={c} panel={panel} /> };
 }
@@ -255,53 +266,66 @@ function EditableField({ field: f }: { field: FieldCellSchema }) {
       {addon(icon)}
     </div>
   );
+  const withButton = (node: ReactNode) =>
+    f.button ? (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>{node}</div>
+        <Button variant={f.button.variant ?? 'outline'} size="sm" style={{ flexShrink: 0 }}>
+          {f.button.label}
+        </Button>
+      </div>
+    ) : (
+      node
+    );
   const text = (extra?: CSSProperties) => (
     <Input value={v} onChange={(e) => setV(e.target.value)} placeholder={c?.type === 'text' ? c.placeholder : undefined} style={full} inputStyle={extra} />
   );
   if (c?.type === 'select') {
     const ph = c.placeholder ?? '선택하세요';
-    return (
-      <Select options={[ph, ...c.options]} width="100%" style={full} value={v || ph} onChange={(e) => setV(e.target.value === ph ? '' : e.target.value)} />
+    return withButton(
+      <Select options={[ph, ...c.options]} width="100%" style={full} value={v || ph} onChange={(e) => setV(e.target.value === ph ? '' : e.target.value)} />,
     );
   }
-  if (c?.type === 'textarea') return <Textarea rows={c.rows ?? 3} value={v} onChange={(e) => setV(e.target.value)} style={full} />;
-  if (c?.type === 'date') return <DateField value={v} onChange={setV} />;
-  if (c?.type === 'file') return withAddon(text({ borderTopRightRadius: 0, borderBottomRightRadius: 0 }), <Icon name="search" size={14} />);
+  if (c?.type === 'textarea') return withButton(<Textarea rows={c.rows ?? 3} value={v} onChange={(e) => setV(e.target.value)} style={full} />);
+  if (c?.type === 'date') return withButton(<DateField value={v} onChange={setV} />);
+  if (c?.type === 'file') return withButton(withAddon(text({ borderTopRightRadius: 0, borderBottomRightRadius: 0 }), <Icon name="search" size={14} />));
   if (c?.type === 'color')
-    return withAddon(
-      text({ borderTopRightRadius: 0, borderBottomRightRadius: 0 }),
-      <span
-        style={{
-          display: 'inline-block',
-          width: 12,
-          height: 12,
-          borderRadius: 2,
-          background: v ? `#${v.replace('#', '')}` : 'var(--pp-gray-300)',
-          border: '1px solid var(--pp-gray-350)',
-        }}
-      />,
+    return withButton(
+      withAddon(
+        text({ borderTopRightRadius: 0, borderBottomRightRadius: 0 }),
+        <span
+          style={{
+            display: 'inline-block',
+            width: 12,
+            height: 12,
+            borderRadius: 2,
+            background: v ? `#${v.replace('#', '')}` : 'var(--pp-gray-300)',
+            border: '1px solid var(--pp-gray-350)',
+          }}
+        />,
+      ),
     );
   if (f.counter) {
     const bytes = f.counter.value ?? new TextEncoder().encode(v).length;
-    return (
+    return withButton(
       <div style={{ position: 'relative' }}>
         {text({ paddingRight: 90 })}
         <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: '#707070', pointerEvents: 'none' }}>
           {bytes} / {f.counter.max} byte
         </span>
-      </div>
+      </div>,
     );
   }
   if (f.unit)
-    return (
+    return withButton(
       <div style={{ position: 'relative' }}>
         {text({ paddingRight: f.unit.length > 1 ? 34 : 22, textAlign: 'right' })}
         <span style={{ position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: '#707070', pointerEvents: 'none' }}>
           {f.unit}
         </span>
-      </div>
+      </div>,
     );
-  return text();
+  return withButton(text());
 }
 
 /** Text input with a calendar addon that opens the design-system Datepicker. */

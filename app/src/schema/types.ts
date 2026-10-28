@@ -74,7 +74,12 @@ export type FieldControlSchema =
   | { type: 'file' }
   | { type: 'color' };
 
-export type FieldTableCellSchema = FieldCellSchema | { blank: number } | { note: string; span?: number };
+export type FieldTableCellSchema =
+  | FieldCellSchema
+  | { blank: number }
+  | { note: string; span?: number }
+  /** Buttons occupying a label+value pair (e.g. [초기화] at the end of a form row). */
+  | { buttons: ActionSchema[]; span?: number; align?: 'left' | 'right' };
 
 /* ------------------------------------------------------------------ data tables */
 
@@ -101,7 +106,15 @@ export type TableRow = Record<string, string>;
 
 export type BlockSchema =
   /** `editable`: every field renders as a live input (edit modals); `readOnly` on a field keeps it grey. */
-  | { type: 'fields'; columns: number; labelWidth?: string; valueWidth?: string; labelAlign?: 'left' | 'right'; editable?: boolean; rows: FieldTableCellSchema[][] }
+  | {
+      type: 'fields';
+      columns: number;
+      labelWidth?: string;
+      valueWidth?: string;
+      labelAlign?: 'left' | 'right';
+      editable?: boolean;
+      rows: FieldTableCellSchema[][];
+    }
   /** List-screen filter rows. `detailRows` are toggled by the 상세검색 button; `rightActions` sit at the far right. */
   | { type: 'searchBar'; rows: FilterSchema[][]; detailRows?: FilterSchema[][]; detailOpen?: boolean; actions?: ActionSchema[]; rightActions?: ActionSchema[] }
   /** rMate-style data grid with optional page-size select and pagination (mock: page buttons highlight only). */
@@ -258,7 +271,16 @@ export interface ScreenSchema {
   id: string;
   title: string;
   shell: {
-    header: { menu: string[]; active: string; userName: string; userPosition: string; lastLogin?: string; shortcuts: string[]; history: string[]; envLabel?: string };
+    header: {
+      menu: string[];
+      active: string;
+      userName: string;
+      userPosition: string;
+      lastLogin?: string;
+      shortcuts: string[];
+      history: string[];
+      envLabel?: string;
+    };
     lnb: { tabs: string[]; tree: LnbNodeSchema[]; activeId: string };
   };
   /** Star after the title: true = filled (즐겨찾기), false = outline, omitted = none. */

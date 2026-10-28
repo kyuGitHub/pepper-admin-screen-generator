@@ -4,7 +4,7 @@ import { ErrorText, Field, inputInner, inputStyle } from '../generator/chrome';
 import { AREAS, PATTERNS, createScreen, updateScreen, uploadThumbnail } from '../lib/screens';
 import { captureThumbnail } from '../lib/thumbnail';
 import { validateScreenSchema } from '../lib/validateSchema';
-import { loanApplicationDetailScreen } from '../screens/loanApplicationDetail/schema';
+import { SAMPLE_SCREENS } from '../screens';
 
 interface Props {
   open: boolean;
@@ -20,6 +20,7 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
   const [text, setText] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
   const [busy, setBusy] = useState<'' | 'saving' | 'thumb'>('');
+  const [sample, setSample] = useState(Object.keys(SAMPLE_SCREENS)[0]);
 
   const reset = () => {
     setTitle('');
@@ -93,20 +94,28 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
       <Field label="화면 스키마 JSON (Claude가 만들어 준 내용을 붙여넣거나 파일 선택)">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
           <input type="file" accept=".json,application/json" onChange={onFile} style={{ fontSize: 12 }} />
-          <Button
-            variant="outline"
-            size="sm"
-            style={{ marginLeft: 'auto' }}
-            onClick={() => {
-              setText(JSON.stringify(loanApplicationDetailScreen, null, 2));
-              if (!title) setTitle('대출신청 상세정보 v3 (샘플)');
-              setArea('여신');
-              setPattern('상세');
-              setErrors([]);
-            }}
-          >
-            v3 샘플 불러오기
-          </Button>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Select
+              options={Object.entries(SAMPLE_SCREENS).map(([value, s]) => ({ value, label: s.label }))}
+              value={sample}
+              onChange={(e) => setSample(e.target.value)}
+              width={240}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const s = SAMPLE_SCREENS[sample];
+                setText(JSON.stringify(s.schema, null, 2));
+                if (!title) setTitle(`${s.label} (샘플)`);
+                setArea(s.area);
+                setPattern(s.pattern);
+                setErrors([]);
+              }}
+            >
+              샘플 불러오기
+            </Button>
+          </div>
         </div>
         <textarea
           value={text}
