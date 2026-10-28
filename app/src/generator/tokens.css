@@ -1,0 +1,94 @@
+/* 화면 제너레이터 — dark editor workspace tokens (Generator design system, UI kit 2026-10-28).
+   Prefix --gen-*. Used only by the generator chrome (login, list, toolbar, editor panel, dialogs);
+   never inside the admin screens, which keep the Digital Admin --pp-* tokens. */
+:root {
+  /* neutrals (dark, cool-neutral) */
+  --gen-bg-0: #0f1012;
+  --gen-bg-1: #16171a;
+  --gen-bg-2: #1d1e22;
+  --gen-bg-3: #25262b;
+  --gen-bg-4: #2e3036;
+  --gen-line-1: #2a2c31;
+  --gen-line-2: #3a3d44;
+  --gen-line-3: #4a4e57;
+  --gen-fg-1: #ececef;
+  --gen-fg-2: #a8abb3;
+  --gen-fg-3: #73767e;
+  --gen-fg-code: #d7dae0;
+  /* accent — editor blue (selection, primary, focus) */
+  --gen-blue-500: #3d7bff;
+  --gen-blue-400: #5a90ff;
+  --gen-blue-300: #8fb3ff;
+  --gen-blue-soft: rgba(61, 123, 255, 0.16);
+  --gen-blue-ring: rgba(61, 123, 255, 0.35);
+  /* status */
+  --gen-amber-500: #f5a524;
+  --gen-amber-soft: rgba(245, 165, 36, 0.14);
+  --gen-red-500: #f0525f;
+  --gen-red-soft: rgba(240, 82, 95, 0.14);
+  --gen-green-500: #2fbf71;
+  /* semantic */
+  --gen-canvas: var(--gen-bg-0);
+  --gen-canvas-dot: #26282d;
+  --gen-app: var(--gen-bg-1);
+  --gen-surface: var(--gen-bg-2);
+  --gen-control: var(--gen-bg-3);
+  --gen-hover: var(--gen-bg-4);
+  --gen-border: var(--gen-line-1);
+  --gen-border-control: var(--gen-line-2);
+  --gen-border-hover: var(--gen-line-3);
+  --gen-text: var(--gen-fg-1);
+  --gen-text-sub: var(--gen-fg-2);
+  --gen-text-hint: var(--gen-fg-3);
+  --gen-accent: var(--gen-blue-500);
+  --gen-accent-hover: var(--gen-blue-400);
+  --gen-accent-text: var(--gen-blue-300);
+  --gen-accent-soft: var(--gen-blue-soft);
+  --gen-focus-ring: 0 0 0 3px var(--gen-blue-ring);
+  --gen-warn: var(--gen-amber-500);
+  --gen-warn-soft: var(--gen-amber-soft);
+  --gen-danger: var(--gen-red-500);
+  --gen-danger-soft: var(--gen-red-soft);
+  --gen-ok: var(--gen-green-500);
+  --gen-select-outline: 2px solid var(--gen-blue-500);
+  --gen-hover-outline: 1px solid var(--gen-blue-400);
+  /* type */
+  --gen-font-ui: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'malgun gothic', sans-serif;
+  --gen-font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  /* size */
+  --gen-toolbar-h: 44px;
+  --gen-control-h: 28px;
+  --gen-control-h-sm: 24px;
+  --gen-control-h-lg: 36px;
+  --gen-panel-w: 320px;
+  --gen-radius-tag: 4px;
+  --gen-radius-control: 6px;
+  --gen-radius-menu: 8px;
+  --gen-radius-card: 10px;
+  --gen-radius-dialog: 12px;
+  --gen-shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --gen-shadow-dialog: 0 24px 64px rgba(0, 0, 0, 0.55);
+  --gen-shadow-frame:
+    0 0 0 1px #2a2c31,
+    0 16px 48px rgba(0, 0, 0, 0.55);
+  --gen-dot-grid: radial-gradient(#26282d 1px, transparent 1px) 0 0/16px 16px;
+}
+
+.gen-root {
+  background: var(--gen-app);
+  color: var(--gen-text);
+  font-family: var(--gen-font-ui);
+}
+.gen-root ::placeholder {
+  color: var(--gen-fg-3);
+}
+.gen-root a {
+  color: var(--gen-accent-text);
+}
+.gen-root a:hover {
+  color: var(--gen-accent-hover);
+}
+/* The admin screen inside the canvas frame is 1100px tall; schema heights written as 100vh follow the frame. */
+.gen-frame {
+  --screen-vh: 1100px;
+}

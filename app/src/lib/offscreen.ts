@@ -19,6 +19,7 @@ export async function renderOffscreen(schema: ScreenSchema, { width = ADMIN_WIDT
   Object.assign(host.style, { position: 'fixed', left: '-20000px', top: '0', width: `${width}px`, height: `${height}px`, overflow: 'hidden' });
   const target = document.createElement('div');
   Object.assign(target.style, { width: `${width}px`, height: `${height}px`, overflow: 'hidden', background: '#fff' });
+  target.style.setProperty('--screen-vh', `${height}px`);
   host.appendChild(target);
   document.body.appendChild(host);
   const root = createRoot(target);

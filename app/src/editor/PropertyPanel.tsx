@@ -1,5 +1,15 @@
-import type { ReactNode } from 'react';
-import { Button, Checkbox, Input, Select, Textarea } from '../design-system';
+import {
+  GenButton as Button,
+  GenCheckbox as Checkbox,
+  GenInput as Input,
+  GenPropActions,
+  GenPropGroup,
+  GenPropHint,
+  GenPropRow,
+  GenPropertyPanel,
+  GenSelect as Select,
+  GenTextarea as Textarea,
+} from '../generator/ui';
 import type {
   ActionSchema,
   BlockSchema,
@@ -25,50 +35,22 @@ const CONTROLS = ['', 'select', 'text', 'date', 'time', 'textarea', 'file', 'col
 export function PropertyPanel() {
   const ed = useEditorRequired();
   const { selection, draft } = ed;
-  const content = selection ? <SelectionForm sel={selection} /> : <Hint />;
   return (
-    <aside
-      data-testid="property-panel"
-      style={{
-        width: 320,
-        flexShrink: 0,
-        borderLeft: '1px solid var(--border-default)',
-        background: '#fff',
-        fontFamily: 'var(--font-sans)',
-        fontSize: 12,
-        color: 'var(--pp-gray-900)',
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: 0,
-      }}
-    >
-      <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-default)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-        속성
-        {selection && <span style={{ fontWeight: 400, color: 'var(--pp-gray-500)' }}>{kindLabel(selection, draft)}</span>}
-        {selection && (
-          <button
-            type="button"
-            onClick={() => ed.select(null)}
-            style={{ marginLeft: 'auto', border: 0, background: 'none', cursor: 'pointer', color: 'var(--pp-gray-500)' }}
-          >
-            선택 해제
-          </button>
-        )}
-      </div>
-      <div style={{ padding: 14, overflow: 'auto', flex: 1 }}>{content}</div>
-    </aside>
+    <GenPropertyPanel subtitle={selection ? kindLabel(selection, draft) || undefined : undefined} onClear={selection ? () => ed.select(null) : undefined}>
+      {selection ? <SelectionForm sel={selection} /> : <Hint />}
+    </GenPropertyPanel>
   );
 }
 
 function kindLabel(sel: Selection, draft: ScreenSchema) {
   const node = getAt(draft, sel.path) as Record<string, unknown> | undefined;
   const name = (node && ((node.label as string) || (node.title as string))) || (sel.kind === 'screen' ? draft.title : '');
-  return name ? `· ${name}` : '';
+  return name;
 }
 
 function Hint() {
   return (
-    <div style={{ color: 'var(--pp-gray-500)', lineHeight: 1.7 }}>
+    <GenPropHint>
       미리보기에서 요소를 클릭하면 여기에서 고칠 수 있습니다.
       <ul style={{ margin: '8px 0 0', paddingLeft: 16 }}>
         <li>화면 제목 → 제목·즐겨찾기·탭/패널 추가</li>
@@ -77,23 +59,18 @@ function Hint() {
         <li>버튼, 탭, 그리드 열, 검색조건 → 이름·종류·순서</li>
       </ul>
       <div style={{ marginTop: 10 }}>팝업은 미리보기에서 열어 둔 상태에서 제목을 클릭합니다.</div>
-    </div>
+    </GenPropHint>
   );
 }
 
 /* ---------------------------------------------------------------- shared form bits */
 
-function Row({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-      <div style={{ width: 72, flexShrink: 0, color: 'var(--pp-gray-600)' }}>{label}</div>
-      <div style={{ flex: 1, minWidth: 0 }}>{children}</div>
-    </div>
-  );
-}
+const Row = GenPropRow;
+const Group = GenPropGroup;
+const Actions = GenPropActions;
 
 function Text({ value, onChange, placeholder }: { value: string | undefined; onChange: (v: string) => void; placeholder?: string }) {
-  return <Input value={value ?? ''} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} style={{ width: '100%' }} />;
+  return <Input value={value ?? ''} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />;
 }
 
 function Num({ value, onChange }: { value: number | undefined; onChange: (v: number | undefined) => void }) {
@@ -104,7 +81,6 @@ function Num({ value, onChange }: { value: number | undefined; onChange: (v: num
         const t = e.target.value.trim();
         onChange(t === '' ? undefined : Number(t) || 0);
       }}
-      style={{ width: '100%' }}
     />
   );
 }
@@ -125,33 +101,12 @@ function Pick({
       value={value ?? ''}
       options={options.map((o) => ({ value: o, label: labels?.[o] ?? (o || '(없음)') }))}
       onChange={(e) => onChange(e.target.value)}
-      style={{ width: '100%' }}
     />
   );
 }
 
 function Lines({ value, onChange, rows = 4 }: { value: string[] | undefined; onChange: (v: string[]) => void; rows?: number }) {
-  return (
-    <Textarea
-      rows={rows}
-      value={(value ?? []).join('\n')}
-      onChange={(e) => onChange(e.target.value.split('\n'))}
-      style={{ width: '100%', boxSizing: 'border-box' }}
-    />
-  );
-}
-
-function Group({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--pp-gray-150)' }}>
-      <div style={{ fontWeight: 700, marginBottom: 8 }}>{title}</div>
-      {children}
-    </div>
-  );
-}
-
-function Actions({ children }: { children: ReactNode }) {
-  return <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>{children}</div>;
+  return <Textarea rows={rows} value={(value ?? []).join('\n')} onChange={(e) => onChange(e.target.value.split('\n'))} />;
 }
 
 /** 순서/삭제 buttons for anything that lives in an array. */
@@ -162,14 +117,14 @@ function ArrayOps({ path, onAdd, addLabel, noun }: { path: Path; onAdd?: () => v
   const idx = path[path.length - 1] as number;
   return (
     <Actions>
-      <Button size="sm" variant="outline" disabled={idx <= 0} onClick={() => ed.move(path, -1)}>
+      <Button size="sm" disabled={idx <= 0} onClick={() => ed.move(path, -1)}>
         ↑ 앞으로
       </Button>
-      <Button size="sm" variant="outline" disabled={idx >= len - 1} onClick={() => ed.move(path, 1)}>
+      <Button size="sm" disabled={idx >= len - 1} onClick={() => ed.move(path, 1)}>
         ↓ 뒤로
       </Button>
       {onAdd && (
-        <Button size="sm" variant="outline" onClick={onAdd}>
+        <Button size="sm" onClick={onAdd}>
           {addLabel ?? `+ ${noun} 추가`}
         </Button>
       )}
@@ -188,24 +143,32 @@ function ActionList({ path, title = '버튼' }: { path: Path; title?: string }) 
     <Group title={title}>
       {list.map((a, i) => (
         <div key={i} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
-          <Input value={actionLabel(a)} onChange={(e) => ed.set([...path, i, 'label'], e.target.value)} style={{ flex: 1 }} />
-          <span style={{ color: 'var(--pp-gray-500)', width: 44 }}>{ACTION_TYPES[a.type]}</span>
+          <Input value={actionLabel(a)} onChange={(e) => ed.set([...path, i, 'label'], e.target.value)} width="auto" style={{ flex: 1 }} />
+          <span style={{ color: 'var(--gen-text-hint)', width: 44, fontSize: 11 }}>{ACTION_TYPES[a.type]}</span>
           <button type="button" onClick={() => ed.select({ kind: 'action', path: [...path, i] })} style={linkBtn}>
             상세
           </button>
-          <button type="button" onClick={() => ed.remove([...path, i])} style={{ ...linkBtn, color: 'var(--bs-danger)' }}>
+          <button type="button" onClick={() => ed.remove([...path, i])} style={{ ...linkBtn, color: 'var(--gen-danger)' }}>
             삭제
           </button>
         </div>
       ))}
-      <Button size="sm" variant="outline" onClick={() => ed.insert([...path, list.length], newAction())}>
+      <Button size="sm" onClick={() => ed.insert([...path, list.length], newAction())}>
         + 버튼 추가
       </Button>
     </Group>
   );
 }
 
-const linkBtn = { border: 0, background: 'none', cursor: 'pointer', color: 'var(--pp-navy-800)', padding: 0, fontSize: 12 } as const;
+const linkBtn = {
+  border: 0,
+  background: 'none',
+  cursor: 'pointer',
+  color: 'var(--gen-accent-text)',
+  padding: 0,
+  fontSize: 12,
+  fontFamily: 'var(--gen-font-ui)',
+} as const;
 
 const ACTION_TYPES: Record<ActionSchema['type'], string> = {
   button: '일반',
@@ -276,21 +239,21 @@ function ScreenForm() {
       <ActionList path={['toolbar', 'actions']} title="툴바 버튼" />
       <Group title="구성">
         <Actions>
-          <Button size="sm" variant="outline" onClick={() => ed.insert(['tabs', s.tabs.length], newTab())}>
+          <Button size="sm" onClick={() => ed.insert(['tabs', s.tabs.length], newTab())}>
             + 탭 추가
           </Button>
-          <Button size="sm" variant="outline" onClick={() => ed.insert(['summary', s.summary.length], newPanel())}>
+          <Button size="sm" onClick={() => ed.insert(['summary', s.summary.length], newPanel())}>
             + 상단 패널 추가
           </Button>
           <Button
             size="sm"
-            variant="outline"
+
             onClick={() => ed.insert(['modals', s.modals?.length ?? 0], { id: `modal_${Date.now().toString(36)}`, title: '새 팝업', width: 600, blocks: [] })}
           >
             + 팝업 추가
           </Button>
         </Actions>
-        <div style={{ color: 'var(--pp-gray-500)', marginTop: 8, lineHeight: 1.6 }}>
+        <div style={{ color: 'var(--gen-text-hint)', marginTop: 8, lineHeight: 1.6 }}>
           탭 {s.tabs.length}개 · 상단 패널 {s.summary.length}개 · 팝업 {s.modals?.length ?? 0}개
         </div>
       </Group>
@@ -304,17 +267,17 @@ function SampleDataGroup() {
   const empty = countEmpty(ed.draft);
   return (
     <Group title="샘플 데이터">
-      <div style={{ color: 'var(--pp-gray-500)', marginBottom: 6 }}>
+      <div style={{ color: 'var(--gen-text-hint)', marginBottom: 6 }}>
         {empty.values || empty.tables ? `빈 값 ${empty.values}개 · 빈 목록 ${empty.tables}개` : '빈 값이 없습니다.'} 라벨·키·단위로 그럴듯한 값을 만듭니다 (실제
         고객 정보 아님).
       </div>
       <Actions>
-        <Button size="sm" variant="outline" disabled={!empty.values && !empty.tables} onClick={() => ed.commit(fillSampleData(ed.draft))}>
+        <Button size="sm" disabled={!empty.values && !empty.tables} onClick={() => ed.commit(fillSampleData(ed.draft))}>
           빈 값 채우기
         </Button>
         <Button
           size="sm"
-          variant="outline"
+
           onClick={() => window.confirm('모든 값과 목록 데이터를 샘플로 다시 만들까요?') && ed.commit(fillSampleData(ed.draft, { mode: 'all' }))}
         >
           전체 다시 생성
@@ -344,21 +307,21 @@ function PanelForm({ path }: { path: Path }) {
       <ActionList path={[...path, 'actions']} title="패널 버튼" />
       <Group title="내용">
         <Actions>
-          <Button size="sm" variant="outline" onClick={addField}>
+          <Button size="sm" onClick={addField}>
             + 필드 추가
           </Button>
           <Button
             size="sm"
-            variant="outline"
+
             onClick={() => ed.insert([...path, 'blocks', p.blocks.length], { type: 'heading', text: '새 소제목' } satisfies BlockSchema)}
           >
             + 소제목 추가
           </Button>
-          <Button size="sm" variant="outline" onClick={() => ed.insert([...path, 'blocks', p.blocks.length], { type: 'divider' } satisfies BlockSchema)}>
+          <Button size="sm" onClick={() => ed.insert([...path, 'blocks', p.blocks.length], { type: 'divider' } satisfies BlockSchema)}>
             + 구분선 추가
           </Button>
         </Actions>
-        <div style={{ color: 'var(--pp-gray-500)', marginTop: 8 }}>
+        <div style={{ color: 'var(--gen-text-hint)', marginTop: 8 }}>
           블록 {p.blocks.length}개 · 필드 {countFields(p.blocks)}개
         </div>
       </Group>
@@ -468,11 +431,11 @@ function FieldForm({ path, dataKey }: { path: Path; dataKey?: string }) {
       <Group title="필드">
         <ArrayOps path={path} noun="필드" onAdd={() => ed.insert([...rowPath, (path[path.length - 1] as number) + 1], newField())} />
         <Actions>
-          <Button size="sm" variant="outline" onClick={() => ed.insert([...blockPath, 'rows', (rowPath[rowPath.length - 1] as number) + 1], [newField()])}>
+          <Button size="sm" onClick={() => ed.insert([...blockPath, 'rows', (rowPath[rowPath.length - 1] as number) + 1], [newField()])}>
             + 아래에 행 추가
           </Button>
           {block && (
-            <Button size="sm" variant="outline" onClick={() => window.confirm('이 행 전체를 삭제할까요?') && ed.remove(rowPath)}>
+            <Button size="sm" onClick={() => window.confirm('이 행 전체를 삭제할까요?') && ed.remove(rowPath)}>
               행 삭제
             </Button>
           )}
@@ -593,17 +556,17 @@ function TabForm({ path }: { path: Path }) {
       <Group title="탭 내용">
         {t.layout ? (
           <>
-            <div style={{ color: 'var(--pp-gray-500)', marginBottom: 6 }}>{cols.map((c, i) => `${i + 1}열 ${c.items.length}개`).join(' · ')}</div>
+            <div style={{ color: 'var(--gen-text-hint)', marginBottom: 6 }}>{cols.map((c, i) => `${i + 1}열 ${c.items.length}개`).join(' · ')}</div>
             <Actions>
               {cols.map((c, i) => (
-                <Button key={i} size="sm" variant="outline" onClick={() => ed.insert([...path, 'layout', 'columns', i, 'items', c.items.length], newPanel())}>
+                <Button key={i} size="sm" onClick={() => ed.insert([...path, 'layout', 'columns', i, 'items', c.items.length], newPanel())}>
                   + {i + 1}열에 패널 추가
                 </Button>
               ))}
             </Actions>
           </>
         ) : (
-          <Button size="sm" variant="outline" onClick={() => ed.set([...path, 'layout'], newTab().layout)}>
+          <Button size="sm" onClick={() => ed.set([...path, 'layout'], newTab().layout)}>
             + 2열 레이아웃 만들기
           </Button>
         )}
@@ -672,11 +635,11 @@ function ColumnForm({ path }: { path: Path }) {
         <Group title={`샘플 값 (${grid.table}, ${rows.length}행)`}>
           {sample.map((v, i) => (
             <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
-              <span style={{ color: 'var(--pp-gray-500)', width: 20 }}>{i + 1}</span>
-              <Input value={v} onChange={(e) => ed.set(['data', 'tables', grid.table, i, c.key], e.target.value)} style={{ flex: 1 }} />
+              <span style={{ color: 'var(--gen-text-hint)', width: 20 }}>{i + 1}</span>
+              <Input value={v} onChange={(e) => ed.set(['data', 'tables', grid.table, i, c.key], e.target.value)} width="auto" style={{ flex: 1 }} />
             </div>
           ))}
-          {rows.length > 3 && <div style={{ color: 'var(--pp-gray-500)' }}>… 나머지 행은 JSON에서 수정</div>}
+          {rows.length > 3 && <div style={{ color: 'var(--gen-text-hint)' }}>… 나머지 행은 JSON에서 수정</div>}
         </Group>
       )}
       <Group title="열">
@@ -767,16 +730,16 @@ function ModalForm({ path }: { path: Path }) {
         <Num value={m.width} onChange={(v) => ed.set([...path, 'width'], v)} />
       </Row>
       <Row label="ID">
-        <Input value={m.id} readOnly style={{ width: '100%' }} />
+        <Input value={m.id} readOnly />
       </Row>
       <Group title="내용">
         <Actions>
-          <Button size="sm" variant="outline" onClick={() => ed.commit(appendModalField(ed.draft, path))}>
+          <Button size="sm" onClick={() => ed.commit(appendModalField(ed.draft, path))}>
             + 필드 추가
           </Button>
           <Button
             size="sm"
-            variant="outline"
+
             onClick={() => ed.insert([...path, 'blocks', m.blocks.length], { type: 'heading', text: '새 소제목' } satisfies BlockSchema)}
           >
             + 소제목 추가
@@ -790,10 +753,10 @@ function ModalForm({ path }: { path: Path }) {
         </>
       ) : (
         <Group title="하단 버튼">
-          <div style={{ color: 'var(--pp-gray-500)', marginBottom: 6 }}>기본 [닫기] 버튼이 표시됩니다.</div>
+          <div style={{ color: 'var(--gen-text-hint)', marginBottom: 6 }}>기본 [닫기] 버튼이 표시됩니다.</div>
           <Button
             size="sm"
-            variant="outline"
+
             onClick={() =>
               ed.set([...path, 'footer'], {
                 right: [
@@ -859,7 +822,7 @@ function BlockForm({ path }: { path: Path }) {
   }
   return (
     <>
-      <div style={{ color: 'var(--pp-gray-500)' }}>블록 종류: {b.type}</div>
+      <div style={{ color: 'var(--gen-text-hint)' }}>블록 종류: {b.type}</div>
       <Group title="블록">
         <ArrayOps path={path} noun="블록" />
       </Group>

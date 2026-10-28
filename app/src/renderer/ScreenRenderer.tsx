@@ -15,6 +15,9 @@ export function ScreenRenderer({ schema }: { schema: ScreenSchema }) {
   );
 }
 
+/** Inside the generator's 1860×1100 canvas frame, 100vh means the frame height (`--screen-vh`, see generator/tokens.css). */
+const frameHeight = (h: string) => h.replace(/100vh/g, 'var(--screen-vh, 100vh)');
+
 const twoCols: CSSProperties = { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 10 };
 
 function Screen() {
@@ -136,7 +139,7 @@ function TabLayout({ layout, path }: { layout: TabLayoutSchema; path?: Path }) {
             display: 'flex',
             flexDirection: 'column',
             gap: 10,
-            ...(layout.heightMode === 'max' ? { maxHeight: layout.height } : { height: layout.height }),
+            ...(layout.heightMode === 'max' ? { maxHeight: frameHeight(layout.height) } : { height: frameHeight(layout.height) }),
             overflowY: 'auto',
             overscrollBehavior: 'contain',
             paddingLeft: col.paddingLeft,

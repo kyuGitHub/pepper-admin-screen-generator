@@ -1,6 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
-import { Button, Checkbox, Input, Modal, Select } from '../design-system';
-import { ErrorText, Field, inputInner, inputStyle } from '../generator/chrome';
+import { GenButton, GenCheckbox, GenCodeArea, GenDialog, GenErrorText, GenField, GenInput, GenSelect } from '../generator/ui';
 import { AREAS, PATTERNS, createScreen, updateScreen, uploadThumbnail } from '../lib/screens';
 import { fillSampleData } from '../lib/sampleData';
 import { captureThumbnail } from '../lib/thumbnail';
@@ -23,19 +22,21 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
   const [busy, setBusy] = useState<'' | 'saving' | 'thumb'>('');
   const [sample, setSample] = useState(Object.keys(SAMPLE_SCREENS)[0]);
   const [fill, setFill] = useState(true);
+  const [fileName, setFileName] = useState('');
 
   const reset = () => {
     setTitle('');
     setText('');
     setErrors([]);
     setBusy('');
+    setFileName('');
   };
 
   const onFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    const content = await f.text();
-    setText(content);
+    setText(await f.text());
+    setFileName(f.name);
     if (!title) setTitle(f.name.replace(/\.json$/i, ''));
     setErrors([]);
   };
@@ -51,10 +52,7 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
       const row = await createScreen({ title: title.trim(), area, pattern, schema });
       setBusy('thumb');
       const blob = await captureThumbnail(schema);
-      if (blob) {
-        const path = await uploadThumbnail(row.id, blob);
-        await updateScreen(row.id, { thumbnail_path: path });
-      }
+      if (blob) await updateScreen(row.id, { thumbnail_path: await uploadThumbnail(row.id, blob) });
       reset();
       onCreated(row.id);
     } catch (e) {
@@ -63,49 +61,58 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
     }
   };
 
+  const close = () => {
+    if (busy) return;
+    reset();
+    onClose();
+  };
+
   return (
-    <Modal
+    <GenDialog
       open={open}
       title="새 화면 올리기"
       width={760}
-      onClose={() => {
-        reset();
-        onClose();
-      }}
+      onClose={close}
       footer={
         <>
-          <Button variant="outline" onClick={onClose} disabled={!!busy}>
+          <GenButton onClick={close} disabled={!!busy}>
             취소
-          </Button>
-          <Button variant="primary" onClick={save} disabled={!!busy || !text.trim()}>
+          </GenButton>
+          <GenButton variant="primary" onClick={save} disabled={!!busy || !text.trim()}>
             {busy === 'saving' ? '저장 중…' : busy === 'thumb' ? '썸네일 생성 중…' : '저장'}
-          </Button>
+          </GenButton>
         </>
       }
     >
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px 160px', gap: 12 }}>
-        <Field label="화면 이름">
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="예: 채널 목록" style={inputStyle} inputStyle={inputInner} />
-        </Field>
-        <Field label="영역">
-          <Select options={[...AREAS]} value={area} onChange={(e) => setArea(e.target.value)} width="100%" style={{ height: 34, fontSize: 13 }} />
-        </Field>
-        <Field label="패턴">
-          <Select options={[...PATTERNS]} value={pattern} onChange={(e) => setPattern(e.target.value)} width="100%" style={{ height: 34, fontSize: 13 }} />
-        </Field>
+        <GenField label="화면 이름">
+          <GenInput value={title} onChange={(e) => setTitle(e.target.value)} placeholder="예: 채널 목록" />
+        </GenField>
+        <GenField label="영역">
+          <GenSelect options={[...AREAS]} value={area} onChange={(e) => setArea(e.target.value)} />
+        </GenField>
+        <GenField label="패턴">
+          <GenSelect options={[...PATTERNS]} value={pattern} onChange={(e) => setPattern(e.target.value)} />
+        </GenField>
       </div>
-      <Field label="화면 스키마 JSON (Claude가 만들어 준 내용을 붙여넣거나 파일 선택)">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-          <input type="file" accept=".json,application/json" onChange={onFile} style={{ fontSize: 12 }} />
+      <GenField label="화면 스키마 JSON (Claude가 만들어 준 내용을 붙여넣거나 파일 선택)">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <label>
+            <GenButton size="sm" onClick={(e) => (e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement | null)?.click()}>
+              파일 선택…
+            </GenButton>
+            <input type="file" accept=".json,application/json" onChange={onFile} style={{ display: 'none' }} />
+          </label>
+          <span style={{ fontSize: 11, color: 'var(--gen-text-hint)', fontFamily: 'var(--gen-font-mono)' }}>{fileName || '.json'}</span>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Select
+            <GenSelect
+              size="sm"
+              width={220}
               options={Object.entries(SAMPLE_SCREENS).map(([value, s]) => ({ value, label: s.label }))}
               value={sample}
               onChange={(e) => setSample(e.target.value)}
-              width={240}
             />
-            <Button
-              variant="outline"
+            <GenButton
               size="sm"
               onClick={() => {
                 const s = SAMPLE_SCREENS[sample];
@@ -117,36 +124,20 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
               }}
             >
               샘플 불러오기
-            </Button>
+            </GenButton>
           </div>
         </div>
-        <textarea
+        <GenCodeArea
           value={text}
-          onChange={(e) => {
-            setText(e.target.value);
+          onChange={(v) => {
+            setText(v);
             setErrors([]);
           }}
-          spellCheck={false}
           placeholder='{ "title": "...", "shell": { ... }, "tabs": [ ... ], "data": { ... } }'
-          style={{
-            display: 'block',
-            width: '100%',
-            height: 260,
-            padding: 10,
-            border: '1px solid var(--pp-gray-200)',
-            borderRadius: 4,
-            fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
-            fontSize: 12,
-            lineHeight: 1.5,
-            resize: 'vertical',
-            boxSizing: 'border-box',
-          }}
         />
-      </Field>
-      <div style={{ marginTop: 8 }}>
-        <Checkbox label="빈 값·빈 목록은 샘플 데이터로 채우기 (라벨·키·단위로 추정, 실제 고객 정보 아님)" checked={fill} onChange={setFill} />
-      </div>
-      <ErrorText>{errors.join('\n')}</ErrorText>
-    </Modal>
+      </GenField>
+      <GenCheckbox label="빈 값·빈 목록은 샘플 데이터로 채우기 (라벨·키·단위로 추정, 실제 고객 정보 아님)" checked={fill} onChange={setFill} />
+      <GenErrorText>{errors.join('\n')}</GenErrorText>
+    </GenDialog>
   );
 }

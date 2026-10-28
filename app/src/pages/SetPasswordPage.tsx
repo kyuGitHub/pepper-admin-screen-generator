@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
-import { Button, Input } from '../design-system';
-import { CenterCard, ErrorText, Field, inputInner, inputStyle } from '../generator/chrome';
+import { GenButton, GenCenterCard, GenErrorText, GenField, GenInput } from '../generator/ui';
 import { db } from '../lib/supabase';
 
 /** Shown after an invite or password-reset link: the user picks a password, then goes to the list. */
@@ -28,35 +27,19 @@ export function SetPasswordPage() {
   };
 
   return (
-    <CenterCard title="비밀번호 설정">
+    <GenCenterCard title="비밀번호 설정">
       <form onSubmit={submit}>
-        <Field label="새 비밀번호 (8자 이상)">
-          <Input
-            type="password"
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            style={inputStyle}
-            inputStyle={inputInner}
-            autoComplete="new-password"
-            required
-          />
-        </Field>
-        <Field label="새 비밀번호 확인">
-          <Input
-            type="password"
-            value={pw2}
-            onChange={(e) => setPw2(e.target.value)}
-            style={inputStyle}
-            inputStyle={inputInner}
-            autoComplete="new-password"
-            required
-          />
-        </Field>
-        <ErrorText>{error}</ErrorText>
-        <Button type="submit" variant="primary" size="lg" disabled={busy} style={{ width: '100%' }}>
+        <GenField label="새 비밀번호 (8자 이상)">
+          <GenInput size="lg" type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="new-password" required />
+        </GenField>
+        <GenField label="새 비밀번호 확인">
+          <GenInput size="lg" type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} autoComplete="new-password" required />
+        </GenField>
+        <GenErrorText>{error}</GenErrorText>
+        <GenButton type="submit" variant="primary" size="lg" block disabled={busy} style={{ marginTop: 6 }}>
           저장하고 시작하기
-        </Button>
+        </GenButton>
       </form>
-    </CenterCard>
+    </GenCenterCard>
   );
 }

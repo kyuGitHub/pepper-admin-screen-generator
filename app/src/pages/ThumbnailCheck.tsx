@@ -14,10 +14,10 @@ export function ThumbnailCheck({ schema }: { schema: ScreenSchema }) {
       .catch((e) => setState({ error: String(e) }));
   }, [schema]);
   return (
-    <div style={{ padding: 20, fontFamily: 'var(--font-sans)', fontSize: 13 }}>
+    <div className="gen-root" style={{ minHeight: '100vh', padding: 20, fontSize: 13 }}>
       <h2 style={{ margin: '0 0 10px' }}>썸네일 캡처 확인 · {schema.title}</h2>
       {state.error && (
-        <div data-testid="thumb-error" style={{ color: 'var(--bs-danger)' }}>
+        <div data-testid="thumb-error" style={{ color: 'var(--gen-danger)' }}>
           실패: {state.error}
         </div>
       )}
@@ -26,7 +26,7 @@ export function ThumbnailCheck({ schema }: { schema: ScreenSchema }) {
           <div data-testid="thumb-ok">
             성공 · {state.size} bytes · {state.ms} ms
           </div>
-          <img src={state.url} alt="thumbnail" style={{ border: '1px solid #ccc', marginTop: 10 }} />
+          <img src={state.url} alt="thumbnail" style={{ border: '1px solid var(--gen-border-control)', marginTop: 10, background: '#fff' }} />
         </>
       )}
       {!state.url && !state.error && <div>캡처 중…</div>}

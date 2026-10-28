@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Textarea } from '../design-system';
+import { GenButton, GenTextarea } from '../generator/ui';
 import { formatUsage, runAi } from '../lib/ai';
 import { useEditorRequired } from './EditorContext';
 
@@ -35,38 +35,39 @@ export function AiModifyBar({ onClose }: { onClose: () => void }) {
 
   return (
     <div
+      className="gen-root"
       style={{
         display: 'flex',
+        flexWrap: 'wrap',
         gap: 10,
         alignItems: 'flex-start',
-        padding: '8px 16px',
-        background: 'var(--pp-gray-80)',
-        borderBottom: '1px solid var(--border-default)',
-        fontFamily: 'var(--font-sans)',
+        padding: '8px 12px',
+        background: 'var(--gen-surface)',
+        borderBottom: '1px solid var(--gen-border)',
         fontSize: 12,
       }}
     >
-      <div style={{ fontWeight: 700, paddingTop: 6, whiteSpace: 'nowrap' }}>AI 수정</div>
-      <Textarea
+      <div style={{ fontWeight: 600, paddingTop: 6, whiteSpace: 'nowrap', color: 'var(--gen-accent-text)' }}>AI 수정</div>
+      <GenTextarea
         rows={2}
         value={text}
         placeholder='예: 신청정보 패널에 "상환방식" 선택 필드를 추가하고, 툴바에 [승인요청] 버튼을 넣어줘. 한도조회이력 탭은 삭제.'
         onChange={(e) => setText(e.target.value)}
         disabled={busy}
-        style={{ flex: 1, fontSize: 12 }}
+        style={{ flex: 1, minWidth: 320 }}
         onKeyDown={(e) => {
           if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && text.trim() && !busy) run();
         }}
       />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <Button variant="primary" size="sm" onClick={run} disabled={busy || !text.trim()}>
+        <GenButton variant="primary" size="sm" onClick={run} disabled={busy || !text.trim()}>
           {busy ? '수정 중…' : '적용 (Ctrl+Enter)'}
-        </Button>
-        <Button variant="outline" size="sm" onClick={onClose} disabled={busy}>
+        </GenButton>
+        <GenButton variant="ghost" size="sm" onClick={onClose} disabled={busy}>
           닫기
-        </Button>
+        </GenButton>
       </div>
-      <div style={{ flexBasis: '100%', color: error ? 'var(--bs-danger)' : 'var(--pp-gray-700)' }}>{error || status}</div>
+      {(error || status) && <div style={{ flexBasis: '100%', color: error ? 'var(--gen-danger)' : 'var(--gen-text-sub)' }}>{error || status}</div>}
     </div>
   );
 }

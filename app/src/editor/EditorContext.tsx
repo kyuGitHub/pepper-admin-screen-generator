@@ -129,7 +129,7 @@ export function Selectable({
   const [hover, setHover] = useState(false);
   if (!editor) return <>{children}</>;
   const on = !!editor.selection && samePath(editor.selection.path, path);
-  const outline = on ? '2px solid var(--pp-navy-800)' : hover ? '1px dashed var(--pp-navy-500)' : '1px dashed transparent';
+  const outline = on ? 'var(--gen-select-outline)' : hover ? 'var(--gen-hover-outline)' : '1px solid transparent';
   return (
     <div
       onClick={(e) => {
@@ -144,23 +144,35 @@ export function Selectable({
         setHover(true);
       }}
       onMouseLeave={() => setHover(false)}
-      style={{ position: 'relative', display: inline ? 'inline-block' : 'block', outline, outlineOffset: 2, borderRadius: 2, cursor: 'pointer', ...style }}
+      style={{
+        position: 'relative',
+        display: inline ? 'inline-block' : 'block',
+        outline,
+        outlineOffset: 2,
+        borderRadius: 2,
+        cursor: 'pointer',
+        background: hover && !on ? 'rgba(61,123,255,.06)' : 'transparent',
+        ...style,
+      }}
     >
-      {on && (
+      {(on || hover) && (
         <span
           style={{
             position: 'absolute',
-            top: -18,
-            left: -2,
+            top: -20,
+            left: -3,
             padding: '0 6px',
-            background: 'var(--pp-navy-800)',
+            background: on ? 'var(--gen-accent)' : 'var(--gen-accent-hover)',
             color: '#fff',
+            fontFamily: 'var(--gen-font-ui)',
             fontSize: 10,
-            lineHeight: '16px',
-            borderRadius: 2,
+            fontWeight: 600,
+            lineHeight: '17px',
+            borderRadius: 3,
             whiteSpace: 'nowrap',
             zIndex: 5,
             pointerEvents: 'none',
+            opacity: on ? 1 : 0.85,
           }}
         >
           {KIND_LABEL[kind]}
