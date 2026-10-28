@@ -1,7 +1,8 @@
 import { useState, type ChangeEvent } from 'react';
-import { Button, Input, Modal, Select } from '../design-system';
+import { Button, Checkbox, Input, Modal, Select } from '../design-system';
 import { ErrorText, Field, inputInner, inputStyle } from '../generator/chrome';
 import { AREAS, PATTERNS, createScreen, updateScreen, uploadThumbnail } from '../lib/screens';
+import { fillSampleData } from '../lib/sampleData';
 import { captureThumbnail } from '../lib/thumbnail';
 import { validateScreenSchema } from '../lib/validateSchema';
 import { SAMPLE_SCREENS } from '../screens';
@@ -21,6 +22,7 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
   const [errors, setErrors] = useState<string[]>([]);
   const [busy, setBusy] = useState<'' | 'saving' | 'thumb'>('');
   const [sample, setSample] = useState(Object.keys(SAMPLE_SCREENS)[0]);
+  const [fill, setFill] = useState(true);
 
   const reset = () => {
     setTitle('');
@@ -45,9 +47,10 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
     setErrors([]);
     setBusy('saving');
     try {
-      const row = await createScreen({ title: title.trim(), area, pattern, schema: result.schema });
+      const schema = fill ? fillSampleData(result.schema) : result.schema;
+      const row = await createScreen({ title: title.trim(), area, pattern, schema });
       setBusy('thumb');
-      const blob = await captureThumbnail(result.schema);
+      const blob = await captureThumbnail(schema);
       if (blob) {
         const path = await uploadThumbnail(row.id, blob);
         await updateScreen(row.id, { thumbnail_path: path });
@@ -140,6 +143,9 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
           }}
         />
       </Field>
+      <div style={{ marginTop: 8 }}>
+        <Checkbox label="빈 값·빈 목록은 샘플 데이터로 채우기 (라벨·키·단위로 추정, 실제 고객 정보 아님)" checked={fill} onChange={setFill} />
+      </div>
       <ErrorText>{errors.join('\n')}</ErrorText>
     </Modal>
   );

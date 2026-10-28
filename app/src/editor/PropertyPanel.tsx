@@ -14,6 +14,7 @@ import type {
 import { useEditorRequired, type Selection } from './EditorContext';
 import { getAt, insertAt, updateAt, type Path } from './paths';
 import { newAction, newColumn, newField, newFilter, newPanel, newTab } from './templates';
+import { countEmpty, fillSampleData } from '../lib/sampleData';
 
 /* Right-hand property panel of the click editor: one small form per selection kind. */
 
@@ -293,7 +294,33 @@ function ScreenForm() {
           탭 {s.tabs.length}개 · 상단 패널 {s.summary.length}개 · 팝업 {s.modals?.length ?? 0}개
         </div>
       </Group>
+      <SampleDataGroup />
     </>
+  );
+}
+
+function SampleDataGroup() {
+  const ed = useEditorRequired();
+  const empty = countEmpty(ed.draft);
+  return (
+    <Group title="샘플 데이터">
+      <div style={{ color: 'var(--pp-gray-500)', marginBottom: 6 }}>
+        {empty.values || empty.tables ? `빈 값 ${empty.values}개 · 빈 목록 ${empty.tables}개` : '빈 값이 없습니다.'} 라벨·키·단위로 그럴듯한 값을 만듭니다 (실제
+        고객 정보 아님).
+      </div>
+      <Actions>
+        <Button size="sm" variant="outline" disabled={!empty.values && !empty.tables} onClick={() => ed.commit(fillSampleData(ed.draft))}>
+          빈 값 채우기
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => window.confirm('모든 값과 목록 데이터를 샘플로 다시 만들까요?') && ed.commit(fillSampleData(ed.draft, { mode: 'all' }))}
+        >
+          전체 다시 생성
+        </Button>
+      </Actions>
+    </Group>
   );
 }
 
