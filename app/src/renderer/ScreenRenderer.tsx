@@ -4,6 +4,8 @@ import type { ActionSchema, ColumnItemSchema, ScreenSchema, TabLayoutSchema } fr
 import { isEditablePanel, sectionOf } from './compile';
 import { ActionButton, Blocks, CollapsibleHeader, PanelView } from './PanelView';
 import { ScreenRuntimeProvider, useScreen } from './runtime';
+import { Selectable, useEditor } from '../editor/EditorContext';
+import type { Path } from '../editor/paths';
 
 export function ScreenRenderer({ schema }: { schema: ScreenSchema }) {
   return (
@@ -17,6 +19,8 @@ const twoCols: CSSProperties = { display: 'grid', gridTemplateColumns: 'minmax(0
 
 function Screen() {
   const { schema, state, actions } = useScreen();
+  const editing = !!useEditor();
+  const P = (p: Path) => (editing ? p : undefined);
   const { header, lnb } = schema.shell;
   const tab = schema.tabs.find((t) => t.label === state.tab);
   return (
@@ -37,7 +41,13 @@ function Screen() {
         <Lnb tree={lnb.tree} tabs={lnb.tabs} activeId={lnb.activeId} open={state.lnbOpen} onToggleOpen={actions.setLnbOpen} />
         <main style={{ flex: 1, minWidth: 0, overflow: 'auto', padding: state.lnbOpen ? '20px 30px' : '20px 30px 20px 53px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid #dee2e6', marginBottom: 20, padding: '0 0 10px 10px' }}>
-            <h4 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.2, margin: 0 }}>{schema.title}</h4>
+            {editing ? (
+              <Selectable kind="screen" path={[]} inline>
+                <h4 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.2, margin: 0 }}>{schema.title}</h4>
+              </Selectable>
+            ) : (
+              <h4 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.2, margin: 0 }}>{schema.title}</h4>
+            )}
             {schema.favorite !== undefined && (
               <span aria-label="즐겨찾기" style={{ fontSize: 20, lineHeight: 1, color: '#303030', marginLeft: 2 }}>
                 {schema.favorite ? '★' : '☆'}
@@ -47,20 +57,35 @@ function Screen() {
           {(schema.toolbar.search || schema.toolbar.actions.length > 0) && <Toolbar />}
           {schema.body && schema.body.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <Blocks blocks={schema.body} gap={10} />
+              <Blocks blocks={schema.body} gap={10} path={P(['body'])} />
             </div>
           )}
           {schema.summary.length > 0 && (
             <div style={{ ...twoCols, marginBottom: 20 }}>
-              {schema.summary.map((p) => (
-                <PanelView key={p.id} panel={p} />
+              {schema.summary.map((p, i) => (
+                <PanelView key={p.id} panel={p} path={P(['summary', i])} />
               ))}
             </div>
           )}
-          {schema.tabs.length > 0 && <Tabs items={schema.tabs.map((t) => t.label)} value={state.tab} onChange={actions.setTab} />}
+          {schema.tabs.length > 0 && (
+            <Tabs
+              items={schema.tabs.map((t, i) => ({
+                value: t.label,
+                label: editing ? (
+                  <Selectable kind="tab" path={['tabs', i]} inline>
+                    {t.label}
+                  </Selectable>
+                ) : (
+                  t.label
+                ),
+              }))}
+              value={state.tab}
+              onChange={actions.setTab}
+            />
+          )}
           {schema.tabs.length > 0 &&
             (tab?.layout ? (
-              <TabLayout layout={tab.layout} />
+              <TabLayout layout={tab.layout} path={P(['tabs', schema.tabs.indexOf(tab), 'layout'])} />
             ) : (
               <div style={{ paddingTop: 20 }}>
                 <Panel title={state.tab}>
@@ -78,6 +103,7 @@ function Screen() {
 
 function Toolbar() {
   const { schema, state, actions } = useScreen();
+  const editing = !!useEditor();
   const { search, actions: items } = schema.toolbar;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 15 }}>
@@ -93,14 +119,14 @@ function Toolbar() {
       )}
       <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
         {items.map((a, i) => (
-          <ActionButton key={i} action={a} />
+          <ActionButton key={i} action={a} path={editing ? ['toolbar', 'actions', i] : undefined} />
         ))}
       </div>
     </div>
   );
 }
 
-function TabLayout({ layout }: { layout: TabLayoutSchema }) {
+function TabLayout({ layout, path }: { layout: TabLayoutSchema; path?: Path }) {
   return (
     <div style={{ ...twoCols, gridTemplateColumns: layout.columns.map(() => 'minmax(0,1fr)').join(' '), alignItems: layout.align, paddingTop: 20 }}>
       {layout.columns.map((col, i) => (
@@ -117,8 +143,8 @@ function TabLayout({ layout }: { layout: TabLayoutSchema }) {
             paddingRight: 6,
           }}
         >
-          {col.items.map((item) => (
-            <ColumnItem key={item.id} item={item} />
+          {col.items.map((item, k) => (
+            <ColumnItem key={item.id} item={item} path={path && [...path, 'columns', i, 'items', k]} />
           ))}
         </div>
       ))}
@@ -126,9 +152,9 @@ function TabLayout({ layout }: { layout: TabLayoutSchema }) {
   );
 }
 
-function ColumnItem({ item }: { item: ColumnItemSchema }) {
+function ColumnItem({ item, path }: { item: ColumnItemSchema; path?: Path }) {
   const { compiled, state, actions } = useScreen();
-  if (item.kind === 'panel') return <PanelView panel={item} />;
+  if (item.kind === 'panel') return <PanelView panel={item} path={path} />;
 
   const instances = compiled.repeats[item.id];
   const keys = instances.map((x) => x.key);
@@ -160,8 +186,8 @@ function ColumnItem({ item }: { item: ColumnItemSchema }) {
             />
             {open && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 10 }}>
-                {inst.panels.map((p) => (
-                  <PanelView key={p.id} panel={p} />
+                {inst.panels.map((p, pi) => (
+                  <PanelView key={p.id} panel={p} path={path && [...path, 'panels', pi]} />
                 ))}
               </div>
             )}
@@ -232,23 +258,34 @@ function HistoryModal() {
 
 function ScreenModals() {
   const { schema, state, actions } = useScreen();
-  const m = schema.modals?.find((x) => x.id === state.modal);
+  const editing = !!useEditor();
+  const mi = schema.modals?.findIndex((x) => x.id === state.modal) ?? -1;
+  const m = mi >= 0 ? schema.modals![mi] : undefined;
   if (!m) return null;
+  const mp: Path | undefined = editing ? ['modals', mi] : undefined;
   return (
     <Modal
       open
-      title={m.title}
+      title={
+        mp ? (
+          <Selectable kind="modal" path={mp} inline>
+            {m.title}
+          </Selectable>
+        ) : (
+          m.title
+        )
+      }
       width={m.width}
       onClose={actions.closeModal}
       footer={
         m.footer ? (
           <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 6 }}>
             {(m.footer.left ?? []).map((a, i) => (
-              <ModalAction key={`l${i}`} action={a} />
+              <ModalAction key={`l${i}`} action={a} path={mp && [...mp, 'footer', 'left', i]} />
             ))}
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
               {(m.footer.right ?? []).map((a, i) => (
-                <ModalAction key={`r${i}`} action={a} />
+                <ModalAction key={`r${i}`} action={a} path={mp && [...mp, 'footer', 'right', i]} />
               ))}
             </div>
           </div>
@@ -259,7 +296,7 @@ function ScreenModals() {
         )
       }
     >
-      <Blocks blocks={m.blocks} gap={m.blockGap ?? 0} />
+      <Blocks blocks={m.blocks} gap={m.blockGap ?? 0} path={mp && [...mp, 'blocks']} />
     </Modal>
   );
 }
@@ -267,13 +304,21 @@ function ScreenModals() {
 const CLOSE_LABELS = new Set(['닫기', '취소']);
 
 /** Footer button of a declared modal: 닫기/취소 close it, everything else is the usual action. */
-function ModalAction({ action }: { action: ActionSchema }) {
+function ModalAction({ action, path }: { action: ActionSchema; path?: Path }) {
   const { actions } = useScreen();
-  if (action.type === 'button' && CLOSE_LABELS.has(action.label))
-    return (
+  if (action.type === 'button' && CLOSE_LABELS.has(action.label)) {
+    const btn = (
       <Button variant={action.variant ?? 'outline'} onClick={actions.closeModal}>
         {action.label}
       </Button>
     );
-  return <ActionButton action={action} />;
+    return path ? (
+      <Selectable kind="action" path={path} inline>
+        {btn}
+      </Selectable>
+    ) : (
+      btn
+    );
+  }
+  return <ActionButton action={action} path={path} />;
 }
