@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
-import { validateScreenSchema } from '../src/lib/validateSchema';
+import { validateScreenSchema } from '../lib/validateSchema';
 import {
   MODELS,
   SYSTEM_PROMPT,
@@ -15,10 +15,10 @@ import {
   type AiEvent,
   type AiRequest,
   type AiUsage,
-} from '../src/server/ai';
-import type { ScreenSchema } from '../src/schema/types';
+} from './ai';
+import type { ScreenSchema } from '../schema/types';
 
-/* Vercel Function: POST /api/generate — calls Claude for a logged-in PM and streams NDJSON events back.
+/* Vercel Function source (bundled to api/generate.js by scripts/build-api.mjs): POST /api/generate — calls Claude for a logged-in PM and streams NDJSON events back.
    The API key lives only here (ANTHROPIC_API_KEY). Each run is written to `ai_runs` (supabase/schema.sql). */
 
 export const config = { maxDuration: 300 };
@@ -42,6 +42,15 @@ export async function GET(): Promise<Response> {
 }
 
 export async function POST(req: Request): Promise<Response> {
+  try {
+    return await handlePost(req);
+  } catch (e) {
+    console.error('generate failed before streaming', e);
+    return json({ message: `서버 함수 오류: ${describeError(e)}`, stack: (e as Error).stack?.split('\n').slice(0, 4).join('\n') }, 500);
+  }
+}
+
+async function handlePost(req: Request): Promise<Response> {
   if (process.env.AI_MOCK === '1') return mock(req);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return json({ message: 'ANTHROPIC_API_KEY가 설정되지 않았습니다. Vercel 환경변수에 등록하세요.' }, 503);

@@ -20,16 +20,27 @@ export async function runAi(body: AiRequest, onEvent: (e: AiEvent) => void, sign
     signal,
   });
   if (!res.ok) {
+    const text = await res.text();
     let message = `서버 오류 ${res.status}`;
     try {
-      message = ((await res.json()) as { message?: string }).message ?? message;
+      const body = JSON.parse(text) as { message?: string; stack?: string };
+      message = body.message ?? message;
+      if (body.stack) message += `\n${body.stack}`;
     } catch {
-      /* non-JSON error body */
+      // Vercel's own error page or an HTML response: show what came back so the cause is visible.
+      const plain = text
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      message += plain ? ` — ${plain.slice(0, 300)}` : ' (응답 본문 없음)';
+      if (/<!doctype html/i.test(text) && /id="root"/.test(text))
+        message = `서버 오류 ${res.status} — /api/generate 요청이 서버 함수가 아니라 앱 페이지로 전달되었습니다 (Vercel 라우팅 문제).`;
     }
     throw new Error(message);
   }
+  if (!res.body) throw new Error('응답 본문이 없습니다.');
   let done: Extract<AiEvent, { type: 'done' }> | null = null;
-  for await (const e of ndjson(res.body!)) {
+  for await (const e of ndjson(res.body)) {
     onEvent(e);
     if (e.type === 'done') done = e;
     if (e.type === 'error') throw new Error(e.message);
