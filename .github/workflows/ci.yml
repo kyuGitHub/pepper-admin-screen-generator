@@ -23,3 +23,5 @@ jobs:
       - run: npm run format
       - run: npm test
       - run: npm run build
+      - name: api/generate.js가 src/server와 일치하는지 확인
+        run: git diff --exit-code -- api/generate.js || (echo '::error::api/generate.js가 오래됨. npm run build:api 후 커밋하세요.' && exit 1)

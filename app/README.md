@@ -18,7 +18,7 @@ npm run build          # 타입체크 + dist/ 빌드
 - DB·스토리지 정의는 `../supabase/schema.sql` (Supabase SQL Editor에서 실행)
 
 ## AI로 화면 만들기 (앱 안에서 생성)
-목록의 [AI로 화면 만들기](`/generate`)에서 요구사항 텍스트(+ 캡처 이미지 최대 4장)를 넣으면 Vercel 서버 함수(`api/generate.ts`)가 Claude API를 호출해 화면 스키마를 만들고, 검증 → 샘플 데이터 채움 → 저장 → 편집 모드로 엽니다. 편집 모드의 [AI 수정]은 "신청정보 패널에 상환방식 추가" 같은 문장을 변경 명령으로 받아 초안에 적용합니다(실행취소 가능).
+목록의 [AI로 화면 만들기](`/generate`)에서 요구사항 텍스트(+ 캡처 이미지 최대 4장)를 넣으면 Vercel 서버 함수(`api/generate.js`, 소스는 `src/server/generate.ts`)가 Claude API를 호출해 화면 스키마를 만들고, 검증 → 샘플 데이터 채움 → 저장 → 편집 모드로 엽니다. 편집 모드의 [AI 수정]은 "신청정보 패널에 상환방식 추가" 같은 문장을 변경 명령으로 받아 초안에 적용합니다(실행취소 가능).
 
 | 항목 | 내용 |
 | --- | --- |
@@ -28,7 +28,7 @@ npm run build          # 타입체크 + dist/ 빌드
 | 보안 | API 키는 Vercel 환경변수 `ANTHROPIC_API_KEY`에만(브라우저로 나가지 않음). Supabase 로그인 토큰이 있어야 호출됨 |
 | 한도·기록 | 사용자별 24시간 `AI_DAILY_LIMIT`회(기본 30). 호출마다 `ai_runs` 테이블에 토큰·비용·소요시간 기록 (`../supabase/schema.sql` 4절) |
 | 실행 시간 | 보통 1~3분, 진행 상황 스트리밍. `vercel.json`의 `maxDuration: 300` |
-| 빌드 | 함수 소스는 `src/server/generate.ts`. `npm run build`가 esbuild로 `api/generate.js` 한 파일로 번들(git 제외)하므로 Vercel은 그 파일만 배포 |
+| 빌드 | 함수 소스는 `src/server/generate.ts`. `npm run build:api`가 esbuild로 `api/generate.js` 한 파일로 번들하며, 이 생성 파일은 git에 포함(Vercel이 함수 목록을 소스 트리에서 읽기 때문). 서버 소스를 고치면 `npm run build:api`로 다시 생성해 함께 커밋 — CI가 최신 여부를 검사 |
 
 설정 순서:
 1. [Anthropic Console](https://console.anthropic.com) → API Keys → 키 발급 (Billing에서 선불 충전과 월 한도 설정 권장).
@@ -107,7 +107,7 @@ Generator 디자인시스템은 Claude Design의 "화면 제너레이터 — UI 
 | `src/editor/` | 클릭 편집기 (요소 선택, 속성 패널, 추가·삭제·순서, 실행취소, 저장) |
 | `src/lib/spec.ts`, `src/lib/export.ts` | 화면정의서 생성(Markdown·HTML), 단일 HTML·PNG·JSON 내보내기 |
 | `src/lib/intake.ts`, `src/lib/schemaGuide.ts`, `src/lib/sampleData.ts` | 요청서 → Claude 프롬프트, 스키마 작성 규칙, 샘플 데이터 생성 |
-| `src/server/generate.ts` → `api/generate.js`(빌드 생성), `src/server/ai.ts`, `src/lib/ai.ts` | AI 생성 서버 함수(인증·한도·스트리밍, esbuild로 단일 파일 번들), 프롬프트·변경 명령 적용, 브라우저 호출 |
+| `src/server/generate.ts` → `api/generate.js`(생성 파일, 커밋 대상), `src/server/ai.ts`, `src/lib/ai.ts` | AI 생성 서버 함수(인증·한도·스트리밍, esbuild로 단일 파일 번들), 프롬프트·변경 명령 적용, 브라우저 호출 |
 | `scripts/` | 단일 파일 빌드 (`build-single.mjs` 데모 전체, `build-viewer.mjs` 내보내기용 뷰어 템플릿) |
 | `src/screens/loanApplicationDetail/` | v3 화면 스키마(`schema.ts`)와 샘플 데이터(`data.ts`) |
 
