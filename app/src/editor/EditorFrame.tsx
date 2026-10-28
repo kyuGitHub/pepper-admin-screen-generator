@@ -5,6 +5,7 @@ import { ScreenRenderer } from '../renderer/ScreenRenderer';
 import type { ScreenSchema } from '../schema/types';
 import { EditorProvider, clickHandled, useEditorRequired } from './EditorContext';
 import { PropertyPanel } from './PropertyPanel';
+import { AiModifyBar } from './AiModifyBar';
 
 /* Edit mode of a screen: navy toolbar with 실행취소/취소/저장, live preview on the left, property panel on the right. */
 
@@ -15,6 +16,8 @@ export interface EditorFrameProps {
   onSave: (schema: ScreenSchema) => Promise<void>;
   onExit: () => void;
   saveLabel?: string;
+  /** Shows [AI 수정] (needs the generate API and a login). */
+  aiEnabled?: boolean;
 }
 
 export function EditorFrame(props: EditorFrameProps) {
@@ -27,8 +30,9 @@ export function EditorFrame(props: EditorFrameProps) {
 
 const tbBtn = { background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' } as const;
 
-function Frame({ heading, onSave, onExit, saveLabel = '저장' }: EditorFrameProps) {
+function Frame({ heading, onSave, onExit, saveLabel = '저장', aiEnabled = false }: EditorFrameProps) {
   const ed = useEditorRequired();
+  const [aiOpen, setAiOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -91,6 +95,11 @@ function Frame({ heading, onSave, onExit, saveLabel = '저장' }: EditorFramePro
         </span>
         {error && <span style={{ color: '#ffb3b3', fontSize: 12, marginLeft: 10 }}>저장 실패: {error}</span>}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+          {aiEnabled && (
+            <Button variant="outline" size="sm" onClick={() => setAiOpen((o) => !o)} style={{ ...tbBtn, borderColor: aiOpen ? '#fff' : 'var(--pp-navy-300)' }}>
+              AI 수정
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={ed.undo} disabled={!ed.canUndo} style={tbBtn}>
             실행취소
           </Button>
@@ -108,6 +117,7 @@ function Frame({ heading, onSave, onExit, saveLabel = '저장' }: EditorFramePro
           </Button>
         </div>
       </Toolbar>
+      {aiEnabled && aiOpen && <AiModifyBar onClose={() => setAiOpen(false)} />}
       <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
         <div style={{ flex: 1, minWidth: 0, overflow: 'auto' }} onClick={(e) => !clickHandled(e) && ed.select(null)}>
           <ScreenRenderer schema={ed.draft} />

@@ -13,14 +13,32 @@ npm run build          # 타입체크 + dist/ 빌드
 
 ## 제너레이터 (스프린트 0)
 - `/login` — Supabase 이메일/비밀번호 로그인. 계정은 Supabase 대시보드에서 초대 메일로 발급하고, 초대 링크를 열면 `/set-password`에서 비밀번호를 정합니다.
-- `/` — 화면 목록: 썸네일 카드, 제목·영역·패턴·작성자 검색, [요청서 만들기] [사용 안내] [새 화면 올리기]
-- `/screens/:id` — 저장된 스키마를 렌더러로 표시, [편집], [복제], [내보내기 ▾], 삭제
+- `/` — 화면 목록: 썸네일 카드, 제목·영역·패턴·작성자 검색, [요청서 만들기] [사용 안내] [AI로 화면 만들기] [새 화면 올리기]
+- `/screens/:id` — 저장된 스키마를 렌더러로 표시, [편집](`?edit=1`로 바로 편집), [복제], [내보내기 ▾], 삭제. 편집 모드에 [AI 수정]
 - DB·스토리지 정의는 `../supabase/schema.sql` (Supabase SQL Editor에서 실행)
+
+## AI로 화면 만들기 (앱 안에서 생성)
+목록의 [AI로 화면 만들기](`/generate`)에서 요구사항 텍스트(+ 캡처 이미지 최대 4장)를 넣으면 Vercel 서버 함수(`api/generate.ts`)가 Claude API를 호출해 화면 스키마를 만들고, 검증 → 샘플 데이터 채움 → 저장 → 편집 모드로 엽니다. 편집 모드의 [AI 수정]은 "신청정보 패널에 상환방식 추가" 같은 문장을 변경 명령으로 받아 초안에 적용합니다(실행취소 가능).
+
+| 항목 | 내용 |
+| --- | --- |
+| 모델 | 기본 Sonnet 5.5 (`claude-sonnet-5-5`), 선택 Opus 5.5. 화면당 약 350~650원(Sonnet) |
+| 프롬프트 | 시스템: 스키마 작성 규칙(캐시) · 사용자: 참고 화면 JSON(캐시) + 이미지 + 요구사항 |
+| 검증 | 결과 JSON을 `validateScreenSchema`로 검사, 실패 시 오류를 돌려줘 1회 자동 재시도 |
+| 보안 | API 키는 Vercel 환경변수 `ANTHROPIC_API_KEY`에만(브라우저로 나가지 않음). Supabase 로그인 토큰이 있어야 호출됨 |
+| 한도·기록 | 사용자별 24시간 `AI_DAILY_LIMIT`회(기본 30). 호출마다 `ai_runs` 테이블에 토큰·비용·소요시간 기록 (`../supabase/schema.sql` 4절) |
+| 실행 시간 | 보통 1~3분, 진행 상황 스트리밍. `vercel.json`의 `maxDuration: 300` |
+
+설정 순서:
+1. [Anthropic Console](https://console.anthropic.com) → API Keys → 키 발급 (Billing에서 선불 충전과 월 한도 설정 권장).
+2. Vercel → 프로젝트 → Settings → Environment Variables → `ANTHROPIC_API_KEY` 등록(값은 키 그대로, 접두사 없음) → Redeploy.
+3. Supabase SQL Editor에서 `../supabase/schema.sql`의 4절(ai_runs)을 실행. 실행 전에도 생성은 되지만 한도와 기록이 동작하지 않습니다.
+4. 로컬: `.env`에 `ANTHROPIC_API_KEY`를 넣으면 `npm run dev`에서 `/api/generate`가 같은 코드로 동작합니다(`vite.config.ts`의 dev 플러그인). 키 없이 UI만 볼 때는 `AI_MOCK=1`.
 
 ## 요청서 → Claude → 화면 (인테이크)
 AI 생성은 Claude(Max 계정)에서, 앱은 요청서와 프롬프트만 만듭니다(API 비용 없음).
 
-- `/intake` **요청서 만들기** — 화면명·메뉴 경로·목적·항목(패널별)·검색 조건/목록 열·버튼과 동작·팝업·케이스·특이사항을 적으면 오른쪽에 Claude용 프롬프트가 만들어집니다. 프롬프트에는 스키마 작성 규칙(`src/lib/schemaGuide.md`)과 참고 화면(내장 샘플 또는 저장된 화면)의 JSON이 포함되어 같은 형식으로 나옵니다. 입력은 브라우저에 자동 저장됩니다.
+- `/intake` **요청서 만들기** — 화면명·메뉴 경로·목적·항목(패널별)·검색 조건/목록 열·버튼과 동작·팝업·케이스·특이사항을 적으면 오른쪽에 Claude용 프롬프트가 만들어집니다. [AI로 바로 생성]을 누르면 같은 내용으로 앱 안에서 생성합니다. 프롬프트에는 스키마 작성 규칙(`src/lib/schemaGuide.md`)과 참고 화면(내장 샘플 또는 저장된 화면)의 JSON이 포함되어 같은 형식으로 나옵니다. 입력은 브라우저에 자동 저장됩니다.
 - `/guide` **사용 안내** — 6단계 흐름, 요령, PM 파일럿 체크리스트, 인테이크 질문지·스키마 규칙 .md 내려받기.
 - 데모 모드: `?intake=1`, `?guide=1`.
 
@@ -77,7 +95,8 @@ AI 생성은 Claude(Max 계정)에서, 앱은 요청서와 프롬프트만 만�
 | `src/renderer/` | 스키마 렌더러와 목업 런타임 (수정→저장/취소, 정보변경이력, 마스킹, 접기/펼치기, 모달, 합계 계산) |
 | `src/editor/` | 클릭 편집기 (요소 선택, 속성 패널, 추가·삭제·순서, 실행취소, 저장) |
 | `src/lib/spec.ts`, `src/lib/export.ts` | 화면정의서 생성(Markdown·HTML), 단일 HTML·PNG·JSON 내보내기 |
-| `src/lib/intake.ts`, `src/lib/schemaGuide.md`, `src/lib/sampleData.ts` | 요청서 → Claude 프롬프트, 스키마 작성 규칙, 샘플 데이터 생성 |
+| `src/lib/intake.ts`, `src/lib/schemaGuide.ts`, `src/lib/sampleData.ts` | 요청서 → Claude 프롬프트, 스키마 작성 규칙, 샘플 데이터 생성 |
+| `api/generate.ts`, `src/server/ai.ts`, `src/lib/ai.ts` | AI 생성 서버 함수(인증·한도·스트리밍), 프롬프트·변경 명령 적용, 브라우저 호출 |
 | `scripts/` | 단일 파일 빌드 (`build-single.mjs` 데모 전체, `build-viewer.mjs` 내보내기용 뷰어 템플릿) |
 | `src/screens/loanApplicationDetail/` | v3 화면 스키마(`schema.ts`)와 샘플 데이터(`data.ts`) |
 

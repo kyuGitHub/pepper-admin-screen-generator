@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '../design-system';
 import { Brand, Toolbar } from '../generator/chrome';
 import { EditorFrame } from '../editor/EditorFrame';
@@ -16,7 +16,12 @@ export function ScreenPage() {
   const navigate = useNavigate();
   const [row, setRow] = useState<ScreenRow | null>(null);
   const [error, setError] = useState('');
-  const [editing, setEditing] = useState(false);
+  const [params, setParams] = useSearchParams();
+  const [editing, setEditingState] = useState(params.get('edit') === '1');
+  const setEditing = (on: boolean) => {
+    setEditingState(on);
+    if (params.has('edit')) setParams({}, { replace: true });
+  };
 
   useEffect(() => {
     getScreen(id)
@@ -87,7 +92,7 @@ export function ScreenPage() {
     </>
   );
 
-  if (editing && row) return <EditorFrame schema={row.schema} heading={heading} onSave={save} onExit={() => setEditing(false)} />;
+  if (editing && row) return <EditorFrame schema={row.schema} heading={heading} onSave={save} onExit={() => setEditing(false)} aiEnabled />;
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>

@@ -74,6 +74,9 @@ export function ScreenListPage() {
           <Link to="/guide" style={{ fontSize: 13, color: 'var(--pp-navy-800)', whiteSpace: 'nowrap' }}>
             사용 안내
           </Link>
+          <Button variant="primary" onClick={() => navigate('/generate')} style={{ height: 34 }}>
+            AI로 화면 만들기
+          </Button>
           <Button variant="danger" onClick={() => setUploadOpen(true)} style={{ height: 34 }}>
             새 화면 올리기
           </Button>
