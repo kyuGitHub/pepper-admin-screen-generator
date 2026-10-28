@@ -42,6 +42,15 @@ export async function GET(): Promise<Response> {
 }
 
 export async function POST(req: Request): Promise<Response> {
+  try {
+    return await handlePost(req);
+  } catch (e) {
+    console.error('generate failed before streaming', e);
+    return json({ message: `서버 함수 오류: ${describeError(e)}`, stack: (e as Error).stack?.split('\n').slice(0, 4).join('\n') }, 500);
+  }
+}
+
+async function handlePost(req: Request): Promise<Response> {
   if (process.env.AI_MOCK === '1') return mock(req);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return json({ message: 'ANTHROPIC_API_KEY가 설정되지 않았습니다. Vercel 환경변수에 등록하세요.' }, 503);
