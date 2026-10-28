@@ -39,4 +39,12 @@ describe('validateScreenSchema', () => {
     expect(r.ok).toBe(true);
     expect(r.schema?.id).toMatch(/^screen-/);
   });
+
+  it('accepts list screens with no tabs but a body, and rejects screens with neither', () => {
+    const base = { title: 'x', shell: { header: {}, lnb: {} }, toolbar: { actions: [] }, summary: [], data: { values: {}, tables: {} }, currentUser: 'u' };
+    expect(validateScreenSchema(JSON.stringify({ ...base, tabs: [], body: [{ type: 'grid', table: 't', columns: [] }] })).ok).toBe(true);
+    const r = validateScreenSchema(JSON.stringify({ ...base, tabs: [] }));
+    expect(r.ok).toBe(false);
+    expect(r.errors.join('\n')).toMatch(/"body"/);
+  });
 });
