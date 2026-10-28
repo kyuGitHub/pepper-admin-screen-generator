@@ -59,6 +59,18 @@ const editableTables = (p: PanelSchema) => {
 function useRuntime(compiled: CompiledScreen) {
   const { schema } = compiled;
   const [s, setS] = useState(() => initialState(schema));
+  // The editor hands in a new schema on every change: refresh data-derived state, keep navigation state.
+  const [prevSchema, setPrevSchema] = useState(schema);
+  if (schema !== prevSchema) {
+    setPrevSchema(schema);
+    setS((prev) => ({
+      ...initialState(schema),
+      tab: schema.tabs.some((t) => t.label === prev.tab) ? prev.tab : (schema.tabs[0]?.label ?? ''),
+      lnbOpen: prev.lnbOpen,
+      modal: prev.modal,
+      collapsed: prev.collapsed,
+    }));
+  }
   const patch = (p: Partial<RuntimeState> | ((s: RuntimeState) => Partial<RuntimeState>)) =>
     setS((prev) => ({ ...prev, ...(typeof p === 'function' ? p(prev) : p) }));
 

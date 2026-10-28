@@ -4,44 +4,59 @@ import type { ActionSchema, BlockSchema, FilterSchema, GridColumnSchema, PanelSc
 import { ActionButton, Blocks } from './PanelView';
 import { useScreen } from './runtime';
 import { resolveText } from './text';
+import { Selectable } from '../editor/EditorContext';
+import type { Path } from '../editor/paths';
 
 /* Blocks used by list screens and edit modals: filter bar, paged grid, collapsible chip, inner tabs, editor placeholder. */
 
-export function SearchBarBlock({ block: b }: { block: Extract<BlockSchema, { type: 'searchBar' }> }) {
+export function SearchBarBlock({ block: b, path }: { block: Extract<BlockSchema, { type: 'searchBar' }>; path?: Path }) {
   const [open, setOpen] = useState(b.detailOpen ?? true);
-  const row = (filters: FilterSchema[], extra?: ReactNode) => (
+  const row = (filters: FilterSchema[], rowPath?: Path, extra?: ReactNode) => (
     <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-      {filters.map((f, i) => (
-        <FilterControl key={i} filter={f} />
-      ))}
+      {filters.map((f, i) =>
+        rowPath ? (
+          <Selectable key={i} kind="filter" path={[...rowPath, i]} inline>
+            <FilterControl filter={f} />
+          </Selectable>
+        ) : (
+          <FilterControl key={i} filter={f} />
+        ),
+      )}
       {extra}
     </div>
   );
-  const actions = (b.actions ?? []).map((a, i) =>
-    a.type === 'detailToggle' ? (
-      <Button key={i} variant="outline" onClick={() => setOpen((o) => !o)}>
+  const actions = (b.actions ?? []).map((a, i) => {
+    const ap = path && [...path, 'actions', i];
+    if (a.type !== 'detailToggle') return <ActionButton key={i} action={a} path={ap} />;
+    const btn = (
+      <Button variant="outline" onClick={() => setOpen((o) => !o)}>
         {(a.label ?? '상세검색') + (open ? ' ^' : ' v')}
       </Button>
+    );
+    return ap ? (
+      <Selectable key={i} kind="action" path={ap} inline>
+        {btn}
+      </Selectable>
     ) : (
-      <ActionButton key={i} action={a} />
-    ),
-  );
+      <span key={i}>{btn}</span>
+    );
+  });
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        {row(b.rows[0] ?? [], <div style={{ display: 'flex', gap: 6, marginLeft: 6 }}>{actions}</div>)}
+        {row(b.rows[0] ?? [], path && [...path, 'rows', 0], <div style={{ display: 'flex', gap: 6, marginLeft: 6 }}>{actions}</div>)}
         {b.rightActions && (
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
             {b.rightActions.map((a, i) => (
-              <ActionButton key={i} action={a} />
+              <ActionButton key={i} action={a} path={path && [...path, 'rightActions', i]} />
             ))}
           </div>
         )}
       </div>
       {b.rows.slice(1).map((r, i) => (
-        <div key={i}>{row(r)}</div>
+        <div key={i}>{row(r, path && [...path, 'rows', i + 1])}</div>
       ))}
-      {open && b.detailRows?.map((r, i) => <div key={`d${i}`}>{row(r)}</div>)}
+      {open && b.detailRows?.map((r, i) => <div key={`d${i}`}>{row(r, path && [...path, 'detailRows', i])}</div>)}
     </div>
   );
 }
@@ -61,7 +76,7 @@ function FilterControl({ filter: f }: { filter: FilterSchema }) {
 
 const linkStyle: CSSProperties = { color: 'var(--pp-navy-500)', textDecoration: 'underline', cursor: 'pointer' };
 
-export function GridBlock({ block: b }: { block: Extract<BlockSchema, { type: 'grid' }> }) {
+export function GridBlock({ block: b, path }: { block: Extract<BlockSchema, { type: 'grid' }>; path?: Path }) {
   const { state, actions, templateCtx } = useScreen();
   const rows = state.tables[b.table] ?? [];
   const pageSize = b.pagination?.pageSize ?? rows.length;
@@ -69,9 +84,15 @@ export function GridBlock({ block: b }: { block: Extract<BlockSchema, { type: 'g
   const totalPages = b.pagination?.totalPages ?? Math.max(1, Math.ceil(rows.length / pageSize));
   const open = (id?: string) => id && actions.openModal(id);
 
-  const columns: DataGridColumn<TableRow>[] = b.columns.map((c) => ({
+  const columns: DataGridColumn<TableRow>[] = b.columns.map((c, ci) => ({
     key: c.key,
-    label: c.label,
+    label: path ? (
+      <Selectable kind="column" path={[...path, 'columns', ci]} inline>
+        {c.label || <span style={{ color: 'var(--pp-gray-400)' }}>(열)</span>}
+      </Selectable>
+    ) : (
+      c.label
+    ),
     width: c.width,
     align: c.align ?? (c.kind === 'link' || c.kind === 'text' ? 'left' : 'center'),
     render: (v, r, i) => renderCell(c, String(v ?? ''), r, i + (page - 1) * pageSize, open),
@@ -168,7 +189,7 @@ function Pager({ page, total, onChange }: { page: number; total: number; onChang
   );
 }
 
-export function CollapsibleBlock({ block: b, panel }: { block: Extract<BlockSchema, { type: 'collapsible' }>; panel?: PanelSchema }) {
+export function CollapsibleBlock({ block: b, panel, path }: { block: Extract<BlockSchema, { type: 'collapsible' }>; panel?: PanelSchema; path?: Path }) {
   const [open, setOpen] = useState(b.open ?? true);
   return (
     <div>
@@ -195,20 +216,24 @@ export function CollapsibleBlock({ block: b, panel }: { block: Extract<BlockSche
       </button>
       {open && (
         <div style={{ paddingTop: 10 }}>
-          <Blocks blocks={b.blocks} panel={panel} gap={6} />
+          <Blocks blocks={b.blocks} panel={panel} gap={6} path={path && [...path, 'blocks']} />
         </div>
       )}
     </div>
   );
 }
 
-export function TabsBlock({ block: b, panel }: { block: Extract<BlockSchema, { type: 'tabs' }>; panel?: PanelSchema }) {
+export function TabsBlock({ block: b, panel, path }: { block: Extract<BlockSchema, { type: 'tabs' }>; panel?: PanelSchema; path?: Path }) {
   const [cur, setCur] = useState(b.items[0]?.label ?? '');
-  const item = b.items.find((t) => t.label === cur) ?? b.items[0];
+  const idx = Math.max(
+    0,
+    b.items.findIndex((t) => t.label === cur),
+  );
+  const item = b.items[idx];
   return (
     <div>
       <Tabs items={b.items.map((t) => t.label)} value={cur} onChange={setCur} />
-      <div style={{ paddingTop: 10 }}>{item && <Blocks blocks={item.blocks} panel={panel} gap={6} />}</div>
+      <div style={{ paddingTop: 10 }}>{item && <Blocks blocks={item.blocks} panel={panel} gap={6} path={path && [...path, 'items', idx, 'blocks']} />}</div>
     </div>
   );
 }
@@ -277,11 +302,11 @@ export function EditorBlock({ block: b }: { block: Extract<BlockSchema, { type: 
   );
 }
 
-export function ActionRowBlock({ block: b, panel }: { block: Extract<BlockSchema, { type: 'actionRow' }>; panel?: PanelSchema }) {
+export function ActionRowBlock({ block: b, panel, path }: { block: Extract<BlockSchema, { type: 'actionRow' }>; panel?: PanelSchema; path?: Path }) {
   return (
     <div style={{ display: 'flex', gap: 6, justifyContent: b.align === 'right' ? 'flex-end' : 'flex-start' }}>
       {b.items.map((a: ActionSchema, i) => (
-        <ActionButton key={i} action={a} panel={panel} />
+        <ActionButton key={i} action={a} panel={panel} path={path && [...path, 'items', i]} />
       ))}
     </div>
   );

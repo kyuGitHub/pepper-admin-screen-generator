@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
+import { EditorFrame } from './editor/EditorFrame';
 import { isConfigured } from './lib/supabase';
 import { LoginPage } from './pages/LoginPage';
 import { ScreenListPage } from './pages/ScreenListPage';
@@ -21,8 +22,30 @@ function RequireAuth({ children }: { children: ReactNode }) {
 export function App() {
   // Demo mode (no Supabase variables): a built-in sample only, picked with ?screen=<key>; used by `npm run build:single`.
   if (!isConfigured) {
-    const key = new URLSearchParams(window.location.search).get('screen') ?? 'loanApplicationDetail';
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get('screen') ?? 'loanApplicationDetail';
     const sample = SAMPLE_SCREENS[key] ?? SAMPLE_SCREENS.loanApplicationDetail;
+    // ?edit=1 opens the click editor on the sample; 저장 downloads the edited JSON (there is no database in demo mode).
+    if (params.get('edit')) {
+      return (
+        <EditorFrame
+          schema={sample.schema}
+          saveLabel="JSON 내려받기"
+          onSave={async (schema) => {
+            const blob = new Blob([JSON.stringify(schema, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${schema.title}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+          }}
+          onExit={() => {
+            params.delete('edit');
+            window.location.search = params.toString();
+          }}
+        />
+      );
+    }
     return (
       <div style={{ height: '100vh' }}>
         <ScreenRenderer schema={sample.schema} />

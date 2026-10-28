@@ -4,12 +4,25 @@ import { ActionRowBlock, CollapsibleBlock, EditorBlock, GridBlock, SearchBarBloc
 import type { ActionSchema, BlockSchema, FieldCellSchema, FieldTableCellSchema, PanelSchema, TableColumnSchema } from '../schema/types';
 import { isField, sectionOf } from './compile';
 import { useScreen } from './runtime';
+import { Selectable } from '../editor/EditorContext';
+import type { Path } from '../editor/paths';
 import { maskValue, resolveText } from './text';
 
 const row = (kids: ReactNode) => <div style={{ display: 'flex', gap: 4 }}>{kids}</div>;
 
 /** Renders one action button. `panel` is absent for toolbar actions. */
-export function ActionButton({ action, panel, size }: { action: ActionSchema; panel?: PanelSchema; size?: ButtonSize }) {
+export function ActionButton({ action, panel, size, path }: { action: ActionSchema; panel?: PanelSchema; size?: ButtonSize; path?: Path }) {
+  const inner = <ActionButtonInner action={action} panel={panel} size={size} />;
+  return path ? (
+    <Selectable kind="action" path={path} inline>
+      {inner}
+    </Selectable>
+  ) : (
+    inner
+  );
+}
+
+function ActionButtonInner({ action, panel, size }: { action: ActionSchema; panel?: PanelSchema; size?: ButtonSize }) {
   const { state, actions, isFormDirty } = useScreen();
   switch (action.type) {
     case 'button':
@@ -47,7 +60,7 @@ export function ActionButton({ action, panel, size }: { action: ActionSchema; pa
   }
 }
 
-function PanelActions({ panel }: { panel: PanelSchema }) {
+function PanelActions({ panel, path }: { panel: PanelSchema; path?: Path }) {
   const { state, actions } = useScreen();
   if (!panel.actions?.length) return null;
   if (state.editing === panel.id)
@@ -61,23 +74,34 @@ function PanelActions({ panel }: { panel: PanelSchema }) {
         </Button>
       </>,
     );
-  return row(panel.actions.map((a, i) => <ActionButton key={i} action={a} panel={panel} size="sm" />));
+  return row(panel.actions.map((a, i) => <ActionButton key={i} action={a} panel={panel} size="sm" path={path && [...path, 'actions', i]} />));
 }
 
-export function PanelView({ panel }: { panel: PanelSchema }) {
+export function PanelView({ panel, path }: { panel: PanelSchema; path?: Path }) {
   const { templateCtx } = useScreen();
-  return (
-    <Panel title={panel.title} meta={resolveText(panel.meta, templateCtx)} actions={panel.actions?.length ? <PanelActions panel={panel} /> : undefined}>
-      <Blocks blocks={panel.blocks} panel={panel} gap={panel.blockGap ?? 6} />
+  const view = (
+    <Panel
+      title={panel.title}
+      meta={resolveText(panel.meta, templateCtx)}
+      actions={panel.actions?.length ? <PanelActions panel={panel} path={path} /> : undefined}
+    >
+      <Blocks blocks={panel.blocks} panel={panel} gap={panel.blockGap ?? 6} path={path && [...path, 'blocks']} />
     </Panel>
+  );
+  return path ? (
+    <Selectable kind="panel" path={path}>
+      {view}
+    </Selectable>
+  ) : (
+    view
   );
 }
 
-export function Blocks({ blocks, panel, gap = 6 }: { blocks: BlockSchema[]; panel?: PanelSchema; gap?: number }) {
+export function Blocks({ blocks, panel, gap = 6, path }: { blocks: BlockSchema[]; panel?: PanelSchema; gap?: number; path?: Path }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap }}>
       {blocks.map((b, i) => (
-        <BlockView key={i} block={b} panel={panel} />
+        <BlockView key={i} block={b} panel={panel} path={path && [...path, i]} />
       ))}
     </div>
   );
@@ -85,29 +109,36 @@ export function Blocks({ blocks, panel, gap = 6 }: { blocks: BlockSchema[]; pane
 
 const muted: CSSProperties = { fontSize: 12, color: '#707070' };
 
-function BlockView({ block: b, panel }: { block: BlockSchema; panel?: PanelSchema }) {
+function BlockView({ block: b, panel, path }: { block: BlockSchema; panel?: PanelSchema; path?: Path }) {
   const { state, actions, templateCtx, isFormDirty } = useScreen();
   switch (b.type) {
     case 'fields':
-      return <FieldsBlock block={b} panel={panel} />;
+      return <FieldsBlock block={b} panel={panel} path={path} />;
     case 'heading': {
       const meta = resolveText(b.meta, templateCtx);
-      return (
+      const node = (
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, padding: '0 5px' }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: '#303030' }}>{resolveText(b.text, templateCtx)}</span>
           {meta && <span style={muted}>{meta}</span>}
         </div>
+      );
+      return path ? (
+        <Selectable kind="block" path={path}>
+          {node}
+        </Selectable>
+      ) : (
+        node
       );
     }
     case 'divider':
       return <div style={{ borderTop: '1px solid #dee2e6', margin: b.tight ? '0 0 4px' : '8px 0 4px' }} />;
     case 'section':
       return b.separated === false ? (
-        <Blocks blocks={b.blocks} panel={panel} gap={10} />
+        <Blocks blocks={b.blocks} panel={panel} gap={10} path={path && [...path, 'blocks']} />
       ) : (
         <div style={{ borderTop: '1px solid #dee2e6', marginTop: 15 }}>
           <div style={{ paddingTop: 12 }}>
-            <Blocks blocks={b.blocks} panel={panel} gap={10} />
+            <Blocks blocks={b.blocks} panel={panel} gap={10} path={path && [...path, 'blocks']} />
           </div>
         </div>
       );
@@ -206,17 +237,17 @@ function BlockView({ block: b, panel }: { block: BlockSchema; panel?: PanelSchem
       );
     }
     case 'searchBar':
-      return <SearchBarBlock block={b} />;
+      return <SearchBarBlock block={b} path={path} />;
     case 'grid':
-      return <GridBlock block={b} />;
+      return <GridBlock block={b} path={path} />;
     case 'collapsible':
-      return <CollapsibleBlock block={b} panel={panel} />;
+      return <CollapsibleBlock block={b} panel={panel} path={path} />;
     case 'tabs':
-      return <TabsBlock block={b} panel={panel} />;
+      return <TabsBlock block={b} panel={panel} path={path} />;
     case 'editor':
       return <EditorBlock block={b} />;
     case 'actionRow':
-      return <ActionRowBlock block={b} panel={panel} />;
+      return <ActionRowBlock block={b} panel={panel} path={path} />;
     case 'text':
       return <div style={{ ...(b.tone === 'muted' ? muted : { fontSize: 12 }), marginBottom: 8 }}>{b.text}</div>;
     case 'empty':
@@ -226,12 +257,12 @@ function BlockView({ block: b, panel }: { block: BlockSchema; panel?: PanelSchem
 
 /* ------------------------------------------------------------------ field tables */
 
-function FieldsBlock({ block, panel }: { block: Extract<BlockSchema, { type: 'fields' }>; panel?: PanelSchema }) {
-  const rows: FieldTableCell[][] = block.rows.map((r) => r.map((c) => toCell(c, panel, block.editable)));
+function FieldsBlock({ block, panel, path }: { block: Extract<BlockSchema, { type: 'fields' }>; panel?: PanelSchema; path?: Path }) {
+  const rows: FieldTableCell[][] = block.rows.map((r, ri) => r.map((c, ci) => toCell(c, panel, block.editable, path && [...path, 'rows', ri, ci])));
   return <FieldTable columns={block.columns} labelWidth={block.labelWidth} valueWidth={block.valueWidth} labelAlign={block.labelAlign} rows={rows} />;
 }
 
-function toCell(c: FieldTableCellSchema, panel?: PanelSchema, editable?: boolean): FieldTableCell {
+function toCell(c: FieldTableCellSchema, panel?: PanelSchema, editable?: boolean, path?: Path): FieldTableCell {
   if ('blank' in c) return { raw: '', colSpan: c.blank * 2 };
   if ('note' in c) return { raw: <span style={{ fontSize: 12, color: '#707070', paddingLeft: 5 }}>{c.note}</span>, colSpan: (c.span ?? 1) * 2 };
   if ('buttons' in c)
@@ -239,14 +270,28 @@ function toCell(c: FieldTableCellSchema, panel?: PanelSchema, editable?: boolean
       raw: (
         <div style={{ display: 'flex', gap: 4, justifyContent: c.align === 'right' ? 'flex-end' : 'flex-start' }}>
           {c.buttons.map((a, i) => (
-            <ActionButton key={i} action={a} panel={panel} size="sm" />
+            <ActionButton key={i} action={a} panel={panel} size="sm" path={path && [...path, 'buttons', i]} />
           ))}
         </div>
       ),
       colSpan: (c.span ?? 1) * 2,
     };
   if (!isField(c)) return { raw: '' };
-  return { label: c.label, span: c.span, render: editable && !c.readOnly ? <EditableField field={c} /> : <FieldValue field={c} panel={panel} /> };
+  const value = editable && !c.readOnly ? <EditableField field={c} /> : <FieldValue field={c} panel={panel} />;
+  if (!path) return { label: c.label, span: c.span, render: value };
+  return {
+    label: (
+      <Selectable kind="field" path={path} dataKey={c.key} inline>
+        {c.label || <span style={{ color: 'var(--pp-gray-400)' }}>(라벨 없음)</span>}
+      </Selectable>
+    ),
+    span: c.span,
+    render: (
+      <Selectable kind="field" path={path} dataKey={c.key}>
+        {value}
+      </Selectable>
+    ),
+  };
 }
 
 /** Live input for edit modals: local state only (the mock never saves it). */
