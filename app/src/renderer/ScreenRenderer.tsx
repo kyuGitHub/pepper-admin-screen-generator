@@ -24,7 +24,7 @@ function Screen() {
       data-screen-label={schema.title}
       style={{
         minWidth: 1860,
-        height: '100vh',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         background: '#fff',

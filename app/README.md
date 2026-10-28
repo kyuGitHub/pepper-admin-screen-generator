@@ -6,9 +6,16 @@
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm run build    # 타입체크 + dist/ 빌드
+cp .env.example .env   # Supabase URL·anon 키 입력. 비워 두면 로그인 없는 데모 모드(샘플 화면만)
+npm run dev            # http://localhost:5173
+npm run build          # 타입체크 + dist/ 빌드
 ```
+
+## 제너레이터 (스프린트 0)
+- `/login` — Supabase 이메일/비밀번호 로그인. 계정은 Supabase 대시보드에서 초대 메일로 발급하고, 초대 링크를 열면 `/set-password`에서 비밀번호를 정합니다.
+- `/` — 화면 목록: 썸네일 카드, 제목·영역·패턴·작성자 검색, [새 화면 올리기]
+- `/screens/:id` — 저장된 스키마를 렌더러로 표시, JSON 내려받기, 삭제
+- DB·스토리지 정의는 `../supabase/schema.sql` (Supabase SQL Editor에서 실행)
 
 ## 구조
 

@@ -1,0 +1,79 @@
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button } from '../design-system';
+import { Brand, Toolbar } from '../generator/chrome';
+import { deleteScreen, getScreen, type ScreenRow } from '../lib/screens';
+import { ScreenRenderer } from '../renderer/ScreenRenderer';
+
+export function ScreenPage() {
+  const { id = '' } = useParams();
+  const navigate = useNavigate();
+  const [row, setRow] = useState<ScreenRow | null>(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    getScreen(id)
+      .then(setRow)
+      .catch((e) => setError(e.message ?? String(e)));
+  }, [id]);
+
+  const downloadJson = () => {
+    if (!row) return;
+    const blob = new Blob([JSON.stringify(row.schema, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${row.title}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const remove = async () => {
+    if (!row || !window.confirm(`"${row.title}" 화면을 삭제할까요? 되돌릴 수 없습니다.`)) return;
+    await deleteScreen(row.id, row.thumbnail_path);
+    navigate('/', { replace: true });
+  };
+
+  return (
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Toolbar>
+        <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 13 }}>
+          ← 목록
+        </Link>
+        <span style={{ color: 'var(--pp-gray-450)' }}>|</span>
+        <Brand />
+        {row && (
+          <>
+            <span style={{ marginLeft: 12, fontWeight: 700 }}>{row.title}</span>
+            <span style={{ fontSize: 11, color: 'var(--pp-gray-450)' }}>
+              {row.area} · {row.pattern}
+            </span>
+          </>
+        )}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={downloadJson}
+            disabled={!row}
+            style={{ background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' }}
+          >
+            JSON 내려받기
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={remove}
+            disabled={!row}
+            style={{ background: 'transparent', color: '#fff', borderColor: 'var(--pp-navy-300)' }}
+          >
+            삭제
+          </Button>
+        </div>
+      </Toolbar>
+      <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+        {error && <div style={{ padding: 30, color: 'var(--bs-danger)', fontFamily: 'var(--font-sans)', fontSize: 13 }}>불러오기 실패: {error}</div>}
+        {row && <ScreenRenderer schema={row.schema} />}
+      </div>
+    </div>
+  );
+}
