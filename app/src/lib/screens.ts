@@ -40,10 +40,14 @@ export async function createScreen(input: {
   schema: ScreenSchema;
   source_id?: string | null;
 }): Promise<ScreenRow> {
-  const { data: auth } = await db().auth.getUser();
+  // The signed-in session is read locally (no network round trip), so the author is not lost when getUser() fails.
+  // The database also fills these from the login token when they are empty (supabase/schema.sql §5).
+  const { data: s } = await db().auth.getSession();
+  let user = s.session?.user ?? null;
+  if (!user) user = (await db().auth.getUser()).data.user;
   const { data, error } = await db()
     .from('screens')
-    .insert({ ...input, created_by: auth.user?.id ?? null, created_by_email: auth.user?.email ?? null })
+    .insert({ ...input, created_by: user?.id ?? null, created_by_email: user?.email ?? null })
     .select('*')
     .single();
   if (error) throw error;

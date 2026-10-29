@@ -24,7 +24,7 @@ export function LoginPage() {
   };
 
   return (
-    <GenCenterCard title="화면 제너레이터 로그인">
+    <GenCenterCard title="페퍼 어드민 제너레이터 로그인">
       <form onSubmit={submit}>
         <GenField label="이메일">
           <GenInput size="lg" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" required />

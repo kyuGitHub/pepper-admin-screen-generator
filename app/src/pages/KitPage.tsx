@@ -96,7 +96,7 @@ export function KitPage() {
             </GenStepItem>
           </ol>
         </div>
-        <GenCenterCard title="화면 제너레이터 로그인" fullPage={false}>
+        <GenCenterCard title="페퍼 어드민 제너레이터 로그인" fullPage={false}>
           <GenField label="이메일">
             <GenInput size="lg" defaultValue="pm@pepper.co.kr" />
           </GenField>

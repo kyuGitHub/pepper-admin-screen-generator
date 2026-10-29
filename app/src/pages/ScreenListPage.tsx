@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
-import { GenBrand, GenButton, GenEmptyState, GenInput, GenPage, GenScreenCard, GenToolbar, GenToolbarButton } from '../generator/ui';
+import { GenButton, GenEmptyState, GenInput, GenPage, GenScreenCard, GenToolbar, GenToolbarButton } from '../generator/ui';
 import { deleteScreen, duplicateScreen, getScreen, listScreens, thumbnailUrl, updateScreen, uploadThumbnail, type ScreenSummary } from '../lib/screens';
 import { captureThumbnail } from '../lib/thumbnail';
+import { authorLabel, formatKst } from '../lib/datetime';
+import { AppNav } from './AppNav';
 import { UploadDialog } from './UploadDialog';
-
-const fmt = (iso: string) => iso.replace('T', ' ').slice(0, 16);
 
 export function ScreenListPage() {
   const { session, signOut } = useAuth();
@@ -47,8 +47,8 @@ export function ScreenListPage() {
   return (
     <GenPage>
       <GenToolbar>
-        <GenBrand />
-        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--gen-text-hint)', fontFamily: 'var(--gen-font-mono)' }}>{session?.user.email}</span>
+        <AppNav />
+        <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--gen-text-hint)' }}>{session?.user.email}</span>
         <GenToolbarButton tone="ghost" onClick={signOut}>
           로그아웃
         </GenToolbarButton>
@@ -57,7 +57,7 @@ export function ScreenListPage() {
       <main style={{ maxWidth: 1400, margin: '0 auto', padding: '28px 32px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 600, letterSpacing: '-0.01em' }}>화면 목록</h1>
-          <span style={{ fontSize: 12, color: 'var(--gen-text-hint)', fontFamily: 'var(--gen-font-mono)' }}>
+          <span style={{ fontSize: 12, color: 'var(--gen-text-hint)', fontVariantNumeric: 'tabular-nums' }}>
             {rows ? `${filtered.length} / ${rows.length}` : ''}
           </span>
           <GenInput
@@ -67,12 +67,6 @@ export function ScreenListPage() {
             width={320}
             style={{ marginLeft: 'auto' }}
           />
-          <GenButton variant="ghost" onClick={() => navigate('/intake')}>
-            요청서 만들기
-          </GenButton>
-          <GenButton variant="ghost" onClick={() => navigate('/guide')}>
-            사용 안내
-          </GenButton>
           <GenButton onClick={() => setUploadOpen(true)}>+ 새 화면 올리기</GenButton>
           <GenButton variant="primary" onClick={() => navigate('/generate')}>
             AI로 화면 만들기
@@ -93,8 +87,9 @@ export function ScreenListPage() {
               title={r.title}
               area={r.area}
               pattern={r.pattern}
-              updatedAt={fmt(r.updated_at)}
-              author={r.created_by_email}
+              updatedAt={formatKst(r.updated_at)}
+              author={authorLabel(r.created_by_email)}
+              authorTitle={r.created_by_email}
               thumbnail={thumbnailUrl(r.thumbnail_path, r.updated_at)}
               onOpen={() => navigate(`/screens/${r.id}`)}
               onDuplicate={() => duplicate(r)}

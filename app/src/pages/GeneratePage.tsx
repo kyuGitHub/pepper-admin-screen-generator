@@ -134,7 +134,7 @@ export function GeneratePage() {
       <GenToolbar>
         <GenToolbarHeading onBack={() => navigate('/')} title="AI로 화면 만들기" />
         {busy && (
-          <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--gen-accent-text)', fontFamily: 'var(--gen-font-mono)' }}>생성 중 · {elapsed}s</span>
+          <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--gen-accent-text)', fontVariantNumeric: 'tabular-nums' }}>생성 중 · {elapsed}s</span>
         )}
       </GenToolbar>
 
