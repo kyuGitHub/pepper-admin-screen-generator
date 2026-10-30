@@ -436,6 +436,6 @@ tr{page-break-inside:avoid}ul{margin:4px 0 8px;padding-left:18px}li{margin:2px 0
 .bar button{font:inherit;padding:5px 12px;border:1px solid #1b2a4a;background:#1b2a4a;color:#fff;border-radius:4px;cursor:pointer}.sub{color:#777;font-size:11px}
 @media print{.bar{display:none}body{padding:0}@page{size:A4 landscape;margin:14mm}}
 </style></head><body>
-<div class="bar"><button onclick="window.print()">인쇄 / PDF 저장</button><span class="sub">Digital Admin 화면 제너레이터에서 생성 · 표를 드래그해 복사하면 PPT/엑셀에 붙여넣을 수 있습니다</span></div>
+<div class="bar"><button onclick="window.print()">인쇄 / PDF 저장</button><span class="sub">페퍼 어드민 제너레이터에서 생성 · 표를 드래그해 복사하면 PPT/엑셀에 붙여넣을 수 있습니다</span></div>
 <h1>${h(doc.title)}</h1>${body}</body></html>`;
 }

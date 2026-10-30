@@ -35,13 +35,13 @@ export function App() {
     // The demo pages use router hooks for links; a memory router keeps them working without URLs.
     if (params.get('intake'))
       return (
-        <MemoryRouter>
+        <MemoryRouter initialEntries={['/intake']}>
           <IntakePage demo />
         </MemoryRouter>
       );
     if (params.get('guide'))
       return (
-        <MemoryRouter>
+        <MemoryRouter initialEntries={['/guide']}>
           <GuidePage demo />
         </MemoryRouter>
       );

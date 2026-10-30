@@ -4,6 +4,7 @@ import { EditorFrame } from '../editor/EditorFrame';
 import { ExportMenu } from '../generator/ExportMenu';
 import { GenCanvas, GenPage, GenToolbar, GenToolbarButton, GenToolbarHeading } from '../generator/ui';
 import { deleteScreen, duplicateScreen, getScreen, updateScreen, uploadThumbnail, type ScreenRow } from '../lib/screens';
+import { authorLabel, formatKst } from '../lib/datetime';
 import { captureThumbnail } from '../lib/thumbnail';
 import { ScreenRenderer } from '../renderer/ScreenRenderer';
 import type { ScreenSchema } from '../schema/types';
@@ -71,7 +72,13 @@ export function ScreenPage() {
     setEditing(false);
   };
 
-  const heading = <GenToolbarHeading onBack={() => navigate('/')} title={row?.title} meta={row && `${row.area} · ${row.pattern}`} />;
+  const heading = (
+    <GenToolbarHeading
+      onBack={() => navigate('/')}
+      title={row?.title}
+      meta={row && `${row.area} · ${row.pattern} · ${authorLabel(row.created_by_email)} · ${formatKst(row.updated_at)}`}
+    />
+  );
 
   if (editing && row) return <EditorFrame schema={row.schema} heading={heading} onSave={save} onExit={() => setEditing(false)} aiEnabled />;
 
@@ -94,7 +101,7 @@ export function ScreenPage() {
                 area: row.area,
                 pattern: row.pattern,
                 author: row.created_by_email ?? undefined,
-                updatedAt: row.updated_at.replace('T', ' ').slice(0, 16),
+                updatedAt: formatKst(row.updated_at),
               }}
               extra={[{ label: '썸네일 갱신', hint: '목록 카드 이미지를 다시 생성', onSelect: refreshThumbnail, disabled: thumbBusy }]}
             />

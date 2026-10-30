@@ -1,18 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  GenButton,
-  GenCheckbox,
-  GenCodeArea,
-  GenField,
-  GenInput,
-  GenPage,
-  GenSection,
-  GenSelect,
-  GenTextarea,
-  GenToolbar,
-  GenToolbarHeading,
-} from '../generator/ui';
+import { GenButton, GenCheckbox, GenCodeArea, GenField, GenInput, GenPage, GenSection, GenSelect, GenTextarea, GenToolbar } from '../generator/ui';
+import { AppNav } from './AppNav';
 import { copyText, downloadText } from '../lib/export';
 import { EMPTY_INTAKE, INTAKE_FIELDS, buildPrompt, requestText, type IntakeForm } from '../lib/intake';
 import { AREAS, PATTERNS, getScreen, listScreens, type ScreenSummary } from '../lib/screens';
@@ -99,7 +88,7 @@ export function IntakePage({ demo = false }: { demo?: boolean }) {
   return (
     <GenPage>
       <GenToolbar>
-        <GenToolbarHeading onBack={demo ? undefined : () => navigate('/')} title="요청서 만들기" />
+        <AppNav />
         {toast && <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--gen-ok)' }}>✓ {toast}</span>}
       </GenToolbar>
 

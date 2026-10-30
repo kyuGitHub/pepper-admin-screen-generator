@@ -86,3 +86,32 @@ drop policy if exists "ai_runs: own read"   on public.ai_runs;
 drop policy if exists "ai_runs: own insert" on public.ai_runs;
 create policy "ai_runs: own read"   on public.ai_runs for select to authenticated using (user_id = auth.uid());
 create policy "ai_runs: own insert" on public.ai_runs for insert to authenticated with check (user_id = auth.uid());
+
+-- 5. 작성자 자동 기록 + 빈 작성자 채우기 (2026-10-29) ---------------------------
+-- 화면을 만들 때 앱이 작성자를 못 넣어도, 로그인 토큰의 사용자·이메일로 채웁니다.
+create or replace function public.set_screen_author()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.created_by is null then
+    new.created_by := auth.uid();
+  end if;
+  if new.created_by_email is null or new.created_by_email = '' then
+    new.created_by_email := coalesce(
+      auth.jwt() ->> 'email',
+      (select u.email from auth.users u where u.id = new.created_by)
+    );
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists screens_set_author on public.screens;
+create trigger screens_set_author
+  before insert on public.screens
+  for each row execute function public.set_screen_author();
+
+-- 이미 저장된 화면 중 작성자 이메일이 비어 있는 행을 사용자 정보로 채움
+update public.screens s
+   set created_by_email = u.email
+  from auth.users u
+ where s.created_by = u.id
+   and (s.created_by_email is null or s.created_by_email = '');

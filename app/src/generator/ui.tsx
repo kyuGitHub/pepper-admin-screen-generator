@@ -11,7 +11,7 @@ import {
 } from 'react';
 
 /* Generator design system — React port of the Gen* components from the "화면 제너레이터 UI kit"
-   (Claude Design, 2026-10-28). Dark workspace, IBM Plex Sans KR / Mono, editor-blue accent.
+   (Claude Design, 2026-10-28). Dark workspace, Pretendard (code fields: IBM Plex Mono), editor-blue accent.
    The admin screens the generator renders keep the Digital Admin design system (src/design-system). */
 
 const H = { sm: 24, md: 28, lg: 36 } as const;
@@ -365,9 +365,39 @@ export function GenToolbar({ children, style }: { children: ReactNode; style?: C
 export function GenBrand() {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 8, whiteSpace: 'nowrap', padding: '0 4px' }}>
-      <span style={{ fontWeight: 700, fontSize: 14, letterSpacing: '-0.01em' }}>화면 제너레이터</span>
-      <span style={{ fontFamily: 'var(--gen-font-mono)', fontSize: 11, color: 'var(--gen-text-hint)' }}>for Digital Admin</span>
+      <span style={{ fontWeight: 700, fontSize: 14, letterSpacing: '-0.01em' }}>페퍼 어드민 제너레이터</span>
     </span>
+  );
+}
+
+/** Top-level menu shown in the toolbar next to the brand (화면 목록 · 요청서 만들기 · 사용 안내). */
+export function GenNav({ items }: { items: { label: string; active?: boolean; onClick: () => void }[] }) {
+  return (
+    <nav style={{ display: 'flex', alignItems: 'center', gap: 2, height: '100%' }}>
+      {items.map((it) => (
+        <button
+          key={it.label}
+          type="button"
+          onClick={it.onClick}
+          aria-current={it.active ? 'page' : undefined}
+          style={{
+            height: '100%',
+            padding: '0 10px',
+            border: 'none',
+            borderBottom: `2px solid ${it.active ? 'var(--gen-accent)' : 'transparent'}`,
+            background: 'transparent',
+            color: it.active ? 'var(--gen-text)' : 'var(--gen-text-sub)',
+            fontFamily: 'var(--gen-font-ui)',
+            fontSize: 13,
+            fontWeight: it.active ? 600 : 500,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {it.label}
+        </button>
+      ))}
+    </nav>
   );
 }
 
@@ -388,7 +418,7 @@ export function GenToolbarHeading({ onBack, title, meta }: { onBack?: () => void
       {meta && (
         <span
           style={{
-            fontFamily: 'var(--gen-font-mono)',
+            fontVariantNumeric: 'tabular-nums',
             fontSize: 11,
             color: 'var(--gen-text-sub)',
             background: 'var(--gen-control)',
@@ -563,6 +593,7 @@ export function GenScreenCard({
   pattern,
   updatedAt,
   author,
+  authorTitle,
   thumbnail,
   onOpen,
   onDuplicate,
@@ -573,6 +604,8 @@ export function GenScreenCard({
   pattern: string;
   updatedAt: string;
   author?: string | null;
+  /** Full author e-mail shown on hover. */
+  authorTitle?: string | null;
   thumbnail?: string | null;
   onOpen: () => void;
   onDuplicate?: () => void;
@@ -644,8 +677,8 @@ export function GenScreenCard({
         >
           {title}
         </a>
-        <div style={{ fontSize: 11, color: 'var(--gen-text-hint)', marginTop: 'auto', fontFamily: 'var(--gen-font-mono)' }}>
-          {updatedAt} · {author || '-'}
+        <div style={{ fontSize: 11, color: 'var(--gen-text-hint)', marginTop: 'auto', fontVariantNumeric: 'tabular-nums' }}>
+          {updatedAt} · <span title={authorTitle ?? undefined}>{author || '작성자 미상'}</span>
         </div>
         <div style={{ display: 'flex', gap: 6, paddingTop: 4 }}>
           <GenButton size="sm" onClick={onOpen}>
@@ -703,7 +736,7 @@ export function GenStepItem({ n, title, children }: { n: number; title: ReactNod
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'var(--gen-font-mono)',
+          fontVariantNumeric: 'tabular-nums',
           fontSize: 12,
           fontWeight: 600,
           flexShrink: 0,
@@ -737,7 +770,7 @@ export function GenSection({
     <section style={{ background: 'var(--gen-surface)', border: '1px solid var(--gen-border)', borderRadius: 10, padding: 20, ...style }}>
       {title && (
         <h1 style={{ margin: '0 0 6px', fontSize: 18, fontWeight: 600 }}>
-          {n && <span style={{ fontFamily: 'var(--gen-font-mono)', color: 'var(--gen-accent-text)', marginRight: 8 }}>{n}</span>}
+          {n && <span style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--gen-accent-text)', marginRight: 8 }}>{n}</span>}
           {title}
         </h1>
       )}
@@ -853,7 +886,7 @@ export function GenCanvas({
             }}
           >
             {label}
-            <span style={{ fontFamily: 'var(--gen-font-mono)', fontSize: 11, color: 'var(--gen-text-hint)' }}>{meta ?? `${width} × ${height}`}</span>
+            <span style={{ fontVariantNumeric: 'tabular-nums', fontSize: 11, color: 'var(--gen-text-hint)' }}>{meta ?? `${width} × ${height}`}</span>
           </div>
         )}
         <div className="gen-frame" style={{ width, height, overflow: 'hidden', background: '#fff', boxShadow: 'var(--gen-shadow-frame)', borderRadius: 2 }}>

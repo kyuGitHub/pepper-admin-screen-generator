@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { GenButton, GenPage, GenStepItem, GenToolbar, GenToolbarHeading } from '../generator/ui';
+import { GenButton, GenPage, GenStepItem, GenToolbar } from '../generator/ui';
+import { AppNav } from './AppNav';
 import { downloadText } from '../lib/export';
 import { intakeMarkdown } from '../lib/intake';
 import { schemaGuide as guide } from '../lib/schemaGuide';
@@ -38,10 +39,10 @@ export function GuidePage({ demo = false }: { demo?: boolean }) {
   return (
     <GenPage>
       <GenToolbar>
-        <GenToolbarHeading onBack={demo ? undefined : () => navigate('/')} title="사용 안내" />
+        <AppNav />
       </GenToolbar>
       <main style={{ maxWidth: 980, margin: '0 auto', padding: '24px 30px', fontSize: 13, lineHeight: 1.7 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 600, margin: '0 0 4px', letterSpacing: '-0.01em' }}>화면 제너레이터 사용 흐름</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 600, margin: '0 0 4px', letterSpacing: '-0.01em' }}>페퍼 어드민 제너레이터 사용 흐름</h1>
         <p style={{ margin: '0 0 18px', color: 'var(--gen-text-sub)' }}>
           PPT 화면설계서 대신, 요구사항 → AI 생성 → 클릭 편집 → URL 공유 → 화면정의서 전달까지 한 흐름입니다. 화면 하나에 목표 10분.
         </p>

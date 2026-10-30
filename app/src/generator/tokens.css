@@ -53,7 +53,8 @@
   --gen-select-outline: 2px solid var(--gen-blue-500);
   --gen-hover-outline: 1px solid var(--gen-blue-400);
   /* type */
-  --gen-font-ui: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'malgun gothic', sans-serif;
+  --gen-font-ui:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'malgun gothic', sans-serif;
   --gen-font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
   /* size */
   --gen-toolbar-h: 44px;
@@ -78,6 +79,7 @@
   background: var(--gen-app);
   color: var(--gen-text);
   font-family: var(--gen-font-ui);
+  -webkit-font-smoothing: antialiased;
 }
 .gen-root ::placeholder {
   color: var(--gen-fg-3);

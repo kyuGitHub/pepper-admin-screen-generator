@@ -103,7 +103,7 @@ export function UploadDialog({ open, onClose, onCreated }: Props) {
             </GenButton>
             <input type="file" accept=".json,application/json" onChange={onFile} style={{ display: 'none' }} />
           </label>
-          <span style={{ fontSize: 11, color: 'var(--gen-text-hint)', fontFamily: 'var(--gen-font-mono)' }}>{fileName || '.json'}</span>
+          <span style={{ fontSize: 11, color: 'var(--gen-text-hint)', fontVariantNumeric: 'tabular-nums' }}>{fileName || '.json'}</span>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
             <GenSelect
               size="sm"
